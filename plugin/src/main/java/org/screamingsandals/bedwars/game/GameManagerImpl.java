@@ -2,6 +2,7 @@ package org.screamingsandals.bedwars.game;
 
 import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
+import org.screamingsandals.bedwars.api.game.Game;
 import org.screamingsandals.bedwars.api.game.GameManager;
 import org.screamingsandals.bedwars.api.game.GameStatus;
 import org.screamingsandals.bedwars.variants.VariantManagerImpl;
@@ -22,7 +23,7 @@ import java.util.stream.Collectors;
         VariantManagerImpl.class // it's important to have variant manager loaded before games manager
 })
 @RequiredArgsConstructor
-public class GameManagerImpl implements GameManager<GameImpl> {
+public class GameManagerImpl implements GameManager {
     @DataFolder("arenas")
     private final Path arenasFolder;
     private final LoggerWrapper logger;
@@ -33,22 +34,22 @@ public class GameManagerImpl implements GameManager<GameImpl> {
     }
 
     @Override
-    public Optional<GameImpl> getGame(String name) {
+    public Optional<Game> getGame(String name) {
         try {
             var uuid = UUID.fromString(name);
             return getGame(uuid);
         } catch (Throwable ignored) {
-            return games.stream().filter(game -> game.getName().equals(name)).findFirst();
+            return games.stream().filter(game -> game.getName().equals(name)).findFirst().map(game -> game);
         }
     }
 
     @Override
-    public Optional<GameImpl> getGame(UUID uuid) {
-        return games.stream().filter(game -> game.getUuid().equals(uuid)).findFirst();
+    public Optional<Game> getGame(UUID uuid) {
+        return games.stream().filter(game -> game.getUuid().equals(uuid)).findFirst().map(game -> game);
     }
 
     @Override
-    public List<GameImpl> getGames() {
+    public List<Game> getGames() {
         return List.copyOf(games);
     }
 
@@ -68,7 +69,7 @@ public class GameManagerImpl implements GameManager<GameImpl> {
     }
 
     @Override
-    public Optional<GameImpl> getGameWithHighestPlayers(boolean fee) {
+    public Optional<Game> getGameWithHighestPlayers(boolean fee) {
         return games.stream()
                 .filter(game -> game.getStatus() == GameStatus.WAITING)
                 .filter(game -> game.countConnectedPlayers() < game.getMaxPlayers())
@@ -78,11 +79,12 @@ public class GameManagerImpl implements GameManager<GameImpl> {
                     }
                     return true;
                 })
-                .max(Comparator.comparingInt(GameImpl::countConnectedPlayers));
+                .max(Comparator.comparingInt(GameImpl::countConnectedPlayers))
+                .map(game -> game);
     }
 
     @Override
-    public Optional<GameImpl> getGameWithLowestPlayers(boolean fee) {
+    public Optional<Game> getGameWithLowestPlayers(boolean fee) {
         return games.stream()
                 .filter(game -> game.getStatus() == GameStatus.WAITING)
                 .filter(game -> game.countConnectedPlayers() < game.getMaxPlayers())
@@ -92,11 +94,12 @@ public class GameManagerImpl implements GameManager<GameImpl> {
                     }
                     return true;
                 })
-                .min(Comparator.comparingInt(GameImpl::countConnectedPlayers));
+                .min(Comparator.comparingInt(GameImpl::countConnectedPlayers))
+                .map(game -> game);
     }
 
     @Override
-    public Optional<GameImpl> getFirstWaitingGame(boolean fee) {
+    public Optional<Game> getFirstWaitingGame(boolean fee) {
         return games.stream()
                 .filter(game -> game.getStatus() == GameStatus.WAITING)
                 .filter(game -> {
@@ -105,11 +108,12 @@ public class GameManagerImpl implements GameManager<GameImpl> {
                     }
                     return true;
                 })
-                .max(Comparator.comparingInt(GameImpl::countConnectedPlayers));
+                .max(Comparator.comparingInt(GameImpl::countConnectedPlayers))
+                .map(game -> game);
     }
 
     @Override
-    public Optional<GameImpl> getFirstRunningGame(boolean fee) {
+    public Optional<Game> getFirstRunningGame(boolean fee) {
         return games.stream()
                 .filter(game -> game.getStatus() == GameStatus.RUNNING || game.getStatus() == GameStatus.GAME_END_CELEBRATING)
                 .filter(game -> {
@@ -118,7 +122,8 @@ public class GameManagerImpl implements GameManager<GameImpl> {
                     }
                     return true;
                 })
-                .max(Comparator.comparingInt(GameImpl::countConnectedPlayers));
+                .max(Comparator.comparingInt(GameImpl::countConnectedPlayers))
+                .map(game -> game);
     }
 
     public void addGame(@NotNull GameImpl game) {

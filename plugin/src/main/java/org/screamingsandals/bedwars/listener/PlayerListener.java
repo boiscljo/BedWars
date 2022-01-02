@@ -729,7 +729,7 @@ public class PlayerListener {
                                         explosionAffectedPlayers.add(player);
                                     }
                                     if (!MainConfig.getInstance().node("tnt-jump", "team-damage").getBoolean(true)) {
-                                        if (game.getPlayerTeam(gPlayer).equals(game.getPlayerTeam(PlayerManagerImpl.getInstance().getPlayer(playerSource.getUniqueId()).orElseThrow()))) {
+                                        if (game.getPlayerTeam(gPlayer).equals(game.getPlayerTeam((BedWarsPlayer) PlayerManagerImpl.getInstance().getPlayer(playerSource.getUniqueId()).orElseThrow()))) {
                                             event.setCancelled(true);
                                         }
                                     }

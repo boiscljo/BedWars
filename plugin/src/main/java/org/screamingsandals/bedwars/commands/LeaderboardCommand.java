@@ -6,6 +6,7 @@ import org.screamingsandals.bedwars.config.MainConfig;
 import org.screamingsandals.bedwars.lang.LangKeys;
 import org.screamingsandals.bedwars.statistics.PlayerStatisticManager;
 import org.screamingsandals.lib.lang.Message;
+import org.screamingsandals.lib.player.PlayerWrapper;
 import org.screamingsandals.lib.sender.CommandSenderWrapper;
 import org.screamingsandals.lib.utils.annotations.Service;
 
@@ -43,9 +44,11 @@ public class LeaderboardCommand extends BaseCommand {
                                         .placeholder("order", l.getAndIncrement())
                                         .placeholder("player", leaderboardEntry
                                                 .getPlayer()
+                                                .as(PlayerWrapper.class)
                                                 .getLastName()
                                                 .orElse(leaderboardEntry
                                                         .getPlayer()
+                                                        .as(PlayerWrapper.class)
                                                         .getUuid()
                                                         .toString()
                                                 )

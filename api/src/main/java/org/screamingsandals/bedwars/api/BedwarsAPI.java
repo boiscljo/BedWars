@@ -25,7 +25,7 @@ public interface BedwarsAPI extends Wrapper {
      *
      * @return the game manager instance
      */
-    GameManager<?> getGameManager();
+    GameManager getGameManager();
 
     /**
      * <p>Retrieves the variant manager instance.</p>
@@ -39,14 +39,14 @@ public interface BedwarsAPI extends Wrapper {
      *
      * @return the player manager instance
      */
-    PlayerManager<?, ?> getPlayerManager();
+    PlayerManager getPlayerManager();
 
     /**
      * <p>Retrieves the entities manager instance.</p>
      *
      * @return the entities manager instance
      */
-    EntitiesManager<?, ?> getEntitiesManager();
+    EntitiesManager getEntitiesManager();
 
     /**
      * @return Event utils used for registering handlers for bedwars' events
@@ -58,7 +58,7 @@ public interface BedwarsAPI extends Wrapper {
      *
      * @return a {@link List} of item spawner types
      */
-    List<ItemSpawnerType<?, ?, ?>> getItemSpawnerTypes();
+    List<ItemSpawnerType> getItemSpawnerTypes();
 
     /**
      * @param name Name of item spawner type
@@ -70,7 +70,7 @@ public interface BedwarsAPI extends Wrapper {
      * @param name Name of item spawner type
      * @return ItemSpawnerType by name or null if type isn't exists
      */
-    ItemSpawnerType<?, ?, ?> getItemSpawnerTypeByName(String name);
+    ItemSpawnerType getItemSpawnerTypeByName(String name);
 
     /**
      * @return String of Bedwars Version
@@ -80,7 +80,7 @@ public interface BedwarsAPI extends Wrapper {
     /**
      * @return Color changer for coloring ItemStacks
      */
-    ColorChanger<?> getColorChanger();
+    ColorChanger getColorChanger();
 
     /**
      *
@@ -92,7 +92,7 @@ public interface BedwarsAPI extends Wrapper {
      *
      * @return PlayerStatisticsManager if statistics are enabled; otherwise null
      */
-    PlayerStatisticsManager<?> getStatisticsManager();
+    PlayerStatisticsManager getStatisticsManager();
 
     /**
      * @return Bedwars instance

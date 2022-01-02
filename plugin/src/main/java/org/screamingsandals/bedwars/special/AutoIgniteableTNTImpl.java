@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Getter
 @EqualsAndHashCode(callSuper = true)
-public class AutoIgniteableTNTImpl extends SpecialItem implements AutoIgniteableTNT<GameImpl, BedWarsPlayer, TeamImpl> {
+public class AutoIgniteableTNTImpl extends SpecialItem implements AutoIgniteableTNT {
 
     public static final Map<Integer, UUID> PROTECTED_PLAYERS = new ConcurrentHashMap<>();
 

@@ -10,7 +10,7 @@ import org.screamingsandals.lib.utils.Wrapper;
  * @author Bedwars Team
  */
 @ApiStatus.NonExtendable
-public interface WarpPowder<G extends Game, P extends BWPlayer, T extends Team, I extends Wrapper> extends SpecialItem<G, P, T> {
+public interface WarpPowder extends SpecialItem {
     /**
      * @param unregisterSpecial
      * @param showMessage
@@ -20,7 +20,7 @@ public interface WarpPowder<G extends Game, P extends BWPlayer, T extends Team, 
     /**
      * @return
      */
-    I getItem();
+    Wrapper getItem();
 
     /**
      *

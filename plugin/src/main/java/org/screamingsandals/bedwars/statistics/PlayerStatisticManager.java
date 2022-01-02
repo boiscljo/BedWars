@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class PlayerStatisticManager implements PlayerStatisticsManager<OfflinePlayerWrapper> {
+public class PlayerStatisticManager implements PlayerStatisticsManager {
     @ConfigFile("database/bw_stats_players.yml")
     private final YamlConfigurationLoader loader;
     private final MainConfig mainConfig;
@@ -134,7 +134,7 @@ public class PlayerStatisticManager implements PlayerStatisticsManager<OfflinePl
         }
     }
 
-    public List<LeaderboardEntry<OfflinePlayerWrapper>> getLeaderboard(int count) {
+    public List<LeaderboardEntry> getLeaderboard(int count) {
         return allScores.entrySet()
                 .stream()
                 .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))

@@ -3,6 +3,7 @@ package org.screamingsandals.bedwars.commands.admin;
 import cloud.commandframework.Command;
 import cloud.commandframework.CommandManager;
 import org.screamingsandals.bedwars.commands.AdminCommand;
+import org.screamingsandals.bedwars.game.GameImpl;
 import org.screamingsandals.bedwars.game.GameManagerImpl;
 import org.screamingsandals.bedwars.lang.LangKeys;
 import org.screamingsandals.lib.lang.Message;
@@ -25,7 +26,7 @@ public class EditCommand extends BaseAdminSubCommand {
 
                             GameManagerImpl.getInstance().getGame(gameName).ifPresentOrElse(game -> {
                                 game.stop();
-                                AdminCommand.gc.put(gameName, game);
+                                AdminCommand.gc.put(gameName, (GameImpl) game);
                                 Message.of(LangKeys.ADMIN_ARENA_SUCCESS_EDIT_MODE)
                                         .defaultPrefix()
                                         .send(sender);

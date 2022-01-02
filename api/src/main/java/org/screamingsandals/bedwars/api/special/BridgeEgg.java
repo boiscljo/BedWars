@@ -7,20 +7,20 @@ import org.screamingsandals.bedwars.api.player.BWPlayer;
 import org.screamingsandals.lib.utils.Wrapper;
 
 @ApiStatus.NonExtendable
-public interface BridgeEgg<G extends Game, P extends BWPlayer, T extends Team, E extends Wrapper, M extends Wrapper> extends SpecialItem<G, P, T> {
+public interface BridgeEgg extends SpecialItem {
     /**
      * <p>Gets the bridge egg projectile.</p>
      *
      * @return the bridge egg projectile
      */
-    E getProjectile();
+    Wrapper getProjectile();
 
     /**
      * <p>Gets the bridge material.</p>
      *
      * @return the bridge material
      */
-    M getMaterial();
+    Wrapper getMaterial();
 
     /**
      * <p>Gets the bridge's max distance.</p>

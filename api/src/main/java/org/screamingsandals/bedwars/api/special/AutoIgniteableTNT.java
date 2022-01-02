@@ -9,7 +9,7 @@ import org.screamingsandals.bedwars.api.player.BWPlayer;
  * @author Bedwars Team
  */
 @ApiStatus.NonExtendable
-public interface AutoIgniteableTNT<G extends Game, P extends BWPlayer, T extends Team> extends SpecialItem<G, P, T> {
+public interface AutoIgniteableTNT extends SpecialItem {
 
     /**
      * @return explosion time in seconds

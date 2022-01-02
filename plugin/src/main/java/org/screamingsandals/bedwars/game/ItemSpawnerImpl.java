@@ -2,8 +2,10 @@ package org.screamingsandals.bedwars.game;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.screamingsandals.bedwars.api.Team;
 import org.screamingsandals.bedwars.api.config.ConfigurationContainer;
 import org.screamingsandals.bedwars.api.game.ItemSpawner;
+import org.screamingsandals.bedwars.api.game.ItemSpawnerType;
 import org.screamingsandals.bedwars.config.MainConfig;
 import org.screamingsandals.bedwars.events.ResourceSpawnEventImpl;
 import org.screamingsandals.bedwars.lang.LangKeys;
@@ -27,11 +29,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class ItemSpawnerImpl implements ItemSpawner<LocationHolder, ItemSpawnerTypeImpl, TeamImpl> {
+public class ItemSpawnerImpl implements ItemSpawner {
     @Getter
     private final LocationHolder location;
-    @Getter
-    @Setter
+
     private ItemSpawnerTypeImpl itemSpawnerType;
     @Getter
     @Setter
@@ -44,7 +45,7 @@ public class ItemSpawnerImpl implements ItemSpawner<LocationHolder, ItemSpawnerT
     private double baseAmountPerSpawn;
     @Getter
     @Setter
-    private TeamImpl team;
+    private Team team;
     @Getter
     @Setter
     private int maxSpawnedResources;
@@ -172,6 +173,16 @@ public class ItemSpawnerImpl implements ItemSpawner<LocationHolder, ItemSpawnerT
                 rerenderHologram = true;
             }
         }
+    }
+
+    @Override
+    public ItemSpawnerType getItemSpawnerType() {
+        return itemSpawnerType;
+    }
+
+    @Override
+    public void setItemSpawnerType(ItemSpawnerType spawnerType) {
+        this.itemSpawnerType = (ItemSpawnerTypeImpl) spawnerType;
     }
 
     public void setTier(int tier) {

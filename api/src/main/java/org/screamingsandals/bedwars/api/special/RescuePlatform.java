@@ -12,7 +12,7 @@ import java.util.List;
  * @author Bedwars Team
  */
 @ApiStatus.NonExtendable
-public interface RescuePlatform<G extends Game, P extends BWPlayer, T extends Team, I extends Wrapper, M extends Wrapper, B extends Wrapper> extends SpecialItem<G, P, T> {
+public interface RescuePlatform extends SpecialItem {
     /**
      * @return
      */
@@ -26,12 +26,12 @@ public interface RescuePlatform<G extends Game, P extends BWPlayer, T extends Te
     /**
      * @return
      */
-    M getMaterial();
+    Wrapper getMaterial();
 
     /**
      * @return
      */
-    I getItem();
+    Wrapper getItem();
 
     /**
      *
@@ -41,5 +41,5 @@ public interface RescuePlatform<G extends Game, P extends BWPlayer, T extends Te
     /**
      * @return
      */
-    List<B> getPlatformBlocks();
+    List<? extends Wrapper> getPlatformBlocks();
 }

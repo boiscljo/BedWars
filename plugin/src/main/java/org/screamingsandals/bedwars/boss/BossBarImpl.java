@@ -6,6 +6,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.screamingsandals.lib.player.PlayerMapper;
 import org.screamingsandals.lib.player.PlayerWrapper;
 import org.screamingsandals.lib.utils.AdventureHelper;
 import org.screamingsandals.lib.utils.adventure.wrapper.BossBarColorWrapper;
@@ -16,7 +17,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 @Getter
-public class BossBarImpl implements org.screamingsandals.bedwars.api.boss.BossBar<PlayerWrapper> {
+public class BossBarImpl implements org.screamingsandals.bedwars.api.boss.BossBar {
     private final List<PlayerWrapper> viewers = new LinkedList<>();
     private final BossBar boss = BossBar.bossBar(
             Component.empty(),
@@ -40,21 +41,23 @@ public class BossBarImpl implements org.screamingsandals.bedwars.api.boss.BossBa
     }
 
     @Override
-    public void addPlayer(PlayerWrapper player) {
-        if (!viewers.contains(player)) {
-            viewers.add(player);
+    public void addPlayer(Object player) {
+        final var playerWrapper = PlayerMapper.wrapPlayer(player);
+        if (!viewers.contains(playerWrapper)) {
+            viewers.add(playerWrapper);
             if (visible) {
-                player.showBossBar(boss);
+                playerWrapper.showBossBar(boss);
             }
         }
     }
 
     @Override
-    public void removePlayer(PlayerWrapper player) {
-        if (viewers.contains(player)) {
-            viewers.remove(player);
+    public void removePlayer(Object player) {
+        final var playerWrapper = PlayerMapper.wrapPlayer(player);
+        if (viewers.contains(playerWrapper)) {
+            viewers.remove(playerWrapper);
             if (visible) {
-                player.hideBossBar(boss);
+                playerWrapper.hideBossBar(boss);
             }
         }
     }

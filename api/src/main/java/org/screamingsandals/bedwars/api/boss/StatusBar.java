@@ -10,17 +10,17 @@ import org.screamingsandals.lib.utils.Wrapper;
  *
  */
 @ApiStatus.NonExtendable
-public interface StatusBar<P extends Wrapper> {
+public interface StatusBar {
 	
 	/**
 	 * @param player
 	 */
-	void addPlayer(P player);
+	void addPlayer(Object player);
 	
 	/**
 	 * @param player
 	 */
-	void removePlayer(P player);
+	void removePlayer(Object player);
 	
 	/**
 	 * @param progress
@@ -30,7 +30,7 @@ public interface StatusBar<P extends Wrapper> {
 	/**
 	 * @return list of all viewers
 	 */
-	List<P> getViewers();
+	List<? extends Wrapper> getViewers();
 	
 	/**
 	 * @return progress of status bar

@@ -18,7 +18,7 @@ import java.util.Arrays;
 
 @AllArgsConstructor
 @Getter
-public class ItemSpawnerTypeImpl implements ItemSpawnerType<ItemTypeHolder, Item, ComponentWrapper> {
+public class ItemSpawnerTypeImpl implements ItemSpawnerType {
     private final String configKey;
     private final String name;
     private final String translatableKey;

@@ -31,6 +31,7 @@ import org.screamingsandals.lib.player.PlayerWrapper;
 import org.screamingsandals.lib.plugin.ServiceManager;
 import org.screamingsandals.lib.utils.AdventureHelper;
 import org.screamingsandals.lib.utils.ConfigurateUtils;
+import org.screamingsandals.lib.utils.adventure.wrapper.ComponentWrapper;
 import org.screamingsandals.lib.utils.annotations.Service;
 import org.screamingsandals.lib.utils.annotations.methods.OnPostEnable;
 import org.screamingsandals.lib.utils.annotations.parameters.DataFolder;
@@ -164,7 +165,7 @@ public class ShopInventory {
                 }
 
                 //noinspection unchecked
-                var applyEvent = new ApplyPropertyToDisplayedItemEventImpl(game.orElse(null), playerManager.getPlayer(event.getPlayer().getUuid()).orElseThrow(), property.getPropertyName(), (Map<String, Object>) converted, finalItem1);
+                var applyEvent = new ApplyPropertyToDisplayedItemEventImpl((GameImpl) game.orElse(null), (BedWarsPlayer) playerManager.getPlayer(event.getPlayer().getUuid()).orElseThrow(), property.getPropertyName(), (Map<String, Object>) converted, finalItem1);
                 EventManager.fire(applyEvent);
 
                 if (applyEvent.getStack() != null) {
@@ -436,7 +437,7 @@ public class ShopInventory {
 
         var materialItem = type.getItem(priceAmount);
         if (event.hasPlayerInInventory(materialItem)) {
-            final var prePurchaseEvent = new StorePrePurchaseEventImpl(game, playerManager.getPlayer(event.getPlayer().getUuid()).orElseThrow(), materialItem, newItem, type, PurchaseType.NORMAL_ITEM, event);
+            final var prePurchaseEvent = new StorePrePurchaseEventImpl((GameImpl) game, (BedWarsPlayer) playerManager.getPlayer(event.getPlayer().getUuid()).orElseThrow(), materialItem, newItem, type, PurchaseType.NORMAL_ITEM, event);
             EventManager.fire(prePurchaseEvent);
             if (prePurchaseEvent.isCancelled()) {
                 return;
@@ -450,7 +451,7 @@ public class ShopInventory {
                 //noinspection unchecked
                 var propertyData = (Map<String, Object>) converted;
                 if (property.hasName()) {
-                    var applyEvent = new ApplyPropertyToBoughtItemEventImpl(game, playerManager.getPlayer(event.getPlayer().getUuid()).orElseThrow(),
+                    var applyEvent = new ApplyPropertyToBoughtItemEventImpl((GameImpl) game, (BedWarsPlayer) playerManager.getPlayer(event.getPlayer().getUuid()).orElseThrow(),
                             property.getPropertyName(), propertyData, newItem);
                     EventManager.fire(applyEvent);
 
@@ -463,7 +464,7 @@ public class ShopInventory {
             }
 
             if (!permaItemPropertyData.isEmpty()) {
-                var applyEvent = new ApplyPropertyToBoughtItemEventImpl(game, playerManager.getPlayer(event.getPlayer().getUuid()).orElseThrow(),
+                var applyEvent = new ApplyPropertyToBoughtItemEventImpl((GameImpl) game, (BedWarsPlayer) playerManager.getPlayer(event.getPlayer().getUuid()).orElseThrow(),
                         "", permaItemPropertyData, newItem);
                 EventManager.fire(applyEvent);
             }
@@ -476,7 +477,7 @@ public class ShopInventory {
 
             if (!mainConfig.node("removePurchaseMessages").getBoolean()) {
                 Message.of(LangKeys.IN_GAME_SHOP_BUY_SUCCESS)
-                        .prefixOrDefault(game.getCustomPrefixComponent())
+                        .prefixOrDefault(game.getCustomPrefixComponent().as(ComponentWrapper.class))
                         .placeholder("item", Component.text(amount + "x ").append(getNameOrCustomNameOfItem(newItem)))
                         .placeholder("material", Component.text(priceAmount + " ").append(type.getItemName()))
                         .send(event.getPlayer());
@@ -488,15 +489,15 @@ public class ShopInventory {
                     (float) MainConfig.getInstance().node("sounds", "item_buy", "pitch").getDouble()
             ));
 
-            EventManager.fire(new StorePostPurchaseEventImpl(game, playerManager.getPlayer(event.getPlayer().getUuid()).orElseThrow(), PurchaseType.NORMAL_ITEM, event));
+            EventManager.fire(new StorePostPurchaseEventImpl((GameImpl) game, (BedWarsPlayer) playerManager.getPlayer(event.getPlayer().getUuid()).orElseThrow(), PurchaseType.NORMAL_ITEM, event));
         } else {
-            final var purchaseFailedEvent = new PurchaseFailedEventImpl(game, playerManager.getPlayer(event.getPlayer().getUuid()).orElseThrow(), PurchaseType.NORMAL_ITEM, event);
+            final var purchaseFailedEvent = new PurchaseFailedEventImpl((GameImpl) game, (BedWarsPlayer) playerManager.getPlayer(event.getPlayer().getUuid()).orElseThrow(), PurchaseType.NORMAL_ITEM, event);
             EventManager.fire(purchaseFailedEvent);
             if (purchaseFailedEvent.isCancelled()) return;
 
             if (!mainConfig.node("removePurchaseMessages").getBoolean()) {
                 Message.of(LangKeys.IN_GAME_SHOP_BUY_FAILED)
-                        .prefixOrDefault(game.getCustomPrefixComponent())
+                        .prefixOrDefault(game.getCustomPrefixComponent().as(ComponentWrapper.class))
                         .placeholder("item", Component.text(amount + "x ").append(getNameOrCustomNameOfItem(newItem)))
                         .placeholder("material", Component.text(priceAmount + " ").append(type.getItemName()))
                         .send(event.getPlayer());
@@ -524,7 +525,7 @@ public class ShopInventory {
         var materialItem = type.getItem(priceAmount);
 
         if (event.hasPlayerInInventory(materialItem)) {
-            final var upgradePurchasedEvent  = new StorePrePurchaseEventImpl(game, playerManager.getPlayer(event.getPlayer().getUuid()).orElseThrow(), materialItem, null, type, PurchaseType.UPGRADES, event);
+            final var upgradePurchasedEvent  = new StorePrePurchaseEventImpl(game, (BedWarsPlayer) playerManager.getPlayer(event.getPlayer().getUuid()).orElseThrow(), materialItem, null, type, PurchaseType.UPGRADES, event);
             EventManager.fire(upgradePurchasedEvent);
             if (upgradePurchasedEvent.isCancelled()) return;
 
@@ -577,7 +578,7 @@ public class ShopInventory {
                     }
 
                     if (isUpgrade) {
-                        var bedwarsUpgradeBoughtEvent = new UpgradeBoughtEventImpl(game, playerManager.getPlayer(player.getUuid()).orElseThrow(), upgrades, addLevels, upgradeStorage);
+                        var bedwarsUpgradeBoughtEvent = new UpgradeBoughtEventImpl(game, (BedWarsPlayer) playerManager.getPlayer(player.getUuid()).orElseThrow(), upgrades, addLevels, upgradeStorage);
                         EventManager.fire(bedwarsUpgradeBoughtEvent);
 
                         if (bedwarsUpgradeBoughtEvent.isCancelled()) {
@@ -628,9 +629,9 @@ public class ShopInventory {
                     ));
                 }
             }
-            EventManager.fire(new StorePostPurchaseEventImpl(game, playerManager.getPlayer(event.getPlayer().getUuid()).orElseThrow(), PurchaseType.UPGRADES, event));
+            EventManager.fire(new StorePostPurchaseEventImpl(game, (BedWarsPlayer) playerManager.getPlayer(event.getPlayer().getUuid()).orElseThrow(), PurchaseType.UPGRADES, event));
         } else {
-            final var purchaseFailedEvent = new PurchaseFailedEventImpl(game, playerManager.getPlayer(event.getPlayer().getUuid()).orElseThrow(), PurchaseType.UPGRADES, event);
+            final var purchaseFailedEvent = new PurchaseFailedEventImpl(game, (BedWarsPlayer) playerManager.getPlayer(event.getPlayer().getUuid()).orElseThrow(), PurchaseType.UPGRADES, event);
             EventManager.fire(purchaseFailedEvent);
             if (purchaseFailedEvent.isCancelled()) return;
 

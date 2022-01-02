@@ -12,7 +12,7 @@ import java.util.List;
  * @author Bedwars Team
  */
 @ApiStatus.NonExtendable
-public interface ProtectionWall<G extends Game, P extends BWPlayer, T extends Team, M extends Wrapper, B extends Wrapper> extends SpecialItem<G, P, T> {
+public interface ProtectionWall extends SpecialItem {
     /**
      * @return
      */
@@ -41,7 +41,7 @@ public interface ProtectionWall<G extends Game, P extends BWPlayer, T extends Te
     /**
      * @return
      */
-    M getMaterial();
+    Wrapper getMaterial();
 
     /**
      *
@@ -51,5 +51,5 @@ public interface ProtectionWall<G extends Game, P extends BWPlayer, T extends Te
     /**
      * @return
      */
-    List<B> getWallBlocks();
+    List<? extends Wrapper> getWallBlocks();
 }

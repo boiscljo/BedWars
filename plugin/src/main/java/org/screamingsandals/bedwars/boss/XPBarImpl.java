@@ -3,33 +3,36 @@ package org.screamingsandals.bedwars.boss;
 import lombok.Getter;
 import org.screamingsandals.bedwars.api.boss.XPBar;
 import org.screamingsandals.bedwars.lib.nms.entity.PlayerUtils;
+import org.screamingsandals.lib.player.PlayerMapper;
 import org.screamingsandals.lib.player.PlayerWrapper;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-public class XPBarImpl implements XPBar<PlayerWrapper> {
+public class XPBarImpl implements XPBar {
     private final List<PlayerWrapper> viewers = new ArrayList<>();
     private boolean visible = false;
     private float progress = 0F;
     private int seconds = 0;
 
     @Override
-    public void addPlayer(PlayerWrapper player) {
-        if (!viewers.contains(player)) {
-            viewers.add(player);
+    public void addPlayer(Object player) {
+        final var playerWrapper = PlayerMapper.wrapPlayer(player);
+        if (!viewers.contains(playerWrapper)) {
+            viewers.add(playerWrapper);
             if (visible) {
-                PlayerUtils.fakeExp(player, progress, seconds);
+                PlayerUtils.fakeExp(playerWrapper, progress, seconds);
             }
         }
     }
 
     @Override
-    public void removePlayer(PlayerWrapper player) {
-        if (viewers.contains(player)) {
-            viewers.remove(player);
-            PlayerUtils.fakeExp(player, player.getExp(), player.getLevel());
+    public void removePlayer(Object player) {
+        final var playerWrapper = PlayerMapper.wrapPlayer(player);
+        if (viewers.contains(playerWrapper)) {
+            viewers.remove(playerWrapper);
+            PlayerUtils.fakeExp(playerWrapper, playerWrapper.getExp(), playerWrapper.getLevel());
         }
     }
 

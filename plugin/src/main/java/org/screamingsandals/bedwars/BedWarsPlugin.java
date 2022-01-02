@@ -327,7 +327,7 @@ public class BedWarsPlugin extends PluginContainer implements BedwarsAPI {
     }
 
     @Override
-    public GameManager<?> getGameManager() {
+    public GameManager getGameManager() {
         return GameManagerImpl.getInstance();
     }
 
@@ -337,12 +337,12 @@ public class BedWarsPlugin extends PluginContainer implements BedwarsAPI {
     }
 
     @Override
-    public PlayerManager<?, ?> getPlayerManager() {
+    public PlayerManager getPlayerManager() {
         return PlayerManagerImpl.getInstance();
     }
 
     @Override
-    public EntitiesManager<?, ?> getEntitiesManager() {
+    public EntitiesManager getEntitiesManager() {
         return EntitiesManagerImpl.getInstance();
     }
 
@@ -352,7 +352,7 @@ public class BedWarsPlugin extends PluginContainer implements BedwarsAPI {
     }
 
     @Override
-    public List<ItemSpawnerType<?, ?, ?>> getItemSpawnerTypes() {
+    public List<ItemSpawnerType> getItemSpawnerTypes() {
         return new ArrayList<>(spawnerTypes.values());
     }
 

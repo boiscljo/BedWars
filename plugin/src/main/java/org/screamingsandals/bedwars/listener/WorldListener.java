@@ -5,7 +5,9 @@ import org.screamingsandals.bedwars.api.config.ConfigurationContainer;
 import org.screamingsandals.bedwars.api.game.GameStatus;
 import org.screamingsandals.bedwars.config.MainConfig;
 import org.screamingsandals.bedwars.entities.EntitiesManagerImpl;
+import org.screamingsandals.bedwars.game.GameImpl;
 import org.screamingsandals.bedwars.game.GameManagerImpl;
+import org.screamingsandals.bedwars.game.TeamImpl;
 import org.screamingsandals.bedwars.utils.ArenaUtils;
 import org.screamingsandals.lib.event.Cancellable;
 import org.screamingsandals.lib.event.OnEvent;
@@ -125,7 +127,7 @@ public class WorldListener {
                             if (game.getConfigurationContainer().getOrDefault(ConfigurationContainer.TARGET_BLOCK_EXPLOSIONS, Boolean.class, false)) {
                                 for (var team : game.getActiveTeams()) {
                                     if (team.getTargetBlock().equals(block.getLocation())) {
-                                        game.targetBlockExplode(team);
+                                        ((GameImpl) game).targetBlockExplode((TeamImpl) team);
                                         break;
                                     }
                                 }
@@ -189,7 +191,7 @@ public class WorldListener {
                         //}
                     } else /*if (game.getStatus() == GameStatus.WAITING) {*/
                         if (game.getLobbyWorld().equals(event.getEntity().getLocation().getWorld())) {
-                            if (event.getEntity().getLocation().getDistanceSquared(game.getLobbySpawn()) <= Math
+                            if (event.getEntity().getLocation().getDistanceSquared(game.getLobbySpawn().as(LocationHolder.class)) <= Math
                                     .pow(MainConfig.getInstance().node("prevent-lobby-spawn-mobs-in-radius").getInt(), 2)) {
                                 event.setCancelled(true);
                                 return;

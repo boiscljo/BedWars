@@ -14,9 +14,11 @@ import org.screamingsandals.bedwars.BedWarsPlugin;
 import org.screamingsandals.bedwars.VersionInfo;
 import org.screamingsandals.bedwars.api.Team;
 import org.screamingsandals.bedwars.api.game.GameStore;
+import org.screamingsandals.bedwars.config.GameConfigurationContainer;
 import org.screamingsandals.bedwars.config.MainConfig;
 import org.screamingsandals.bedwars.game.GameImpl;
 import org.screamingsandals.bedwars.game.GameManagerImpl;
+import org.screamingsandals.bedwars.game.ItemSpawnerImpl;
 import org.screamingsandals.bedwars.inventories.ShopInventory;
 import org.screamingsandals.bedwars.lang.LangKeys;
 import org.screamingsandals.bedwars.lib.debug.Debug;
@@ -132,19 +134,19 @@ public class DumpCommand extends BaseCommand {
                                                                                     "arenaTime", game.getArenaTime(),
                                                                                     "weather", game.getArenaWeather(),
                                                                                     "customPrefix", game.getCustomPrefix(),
-                                                                                    "spawners", game.getSpawners().stream().map(itemSpawner -> nullValuesAllowingMap(
+                                                                                    "spawners", game.getItemSpawners().stream().map(itemSpawner -> nullValuesAllowingMap(
                                                                                             "type", itemSpawner.getItemSpawnerType().getConfigKey(),
                                                                                             "location", itemSpawner.getLocation(),
-                                                                                            "maxSpawnedResources", itemSpawner.getMaxSpawnedResources(),
+                                                                                            "maxSpawnedResources", ((ItemSpawnerImpl) itemSpawner).getMaxSpawnedResources(),
                                                                                             "startLevel", itemSpawner.getBaseAmountPerSpawn(),
                                                                                             "name", itemSpawner.getCustomName(),
                                                                                             "team", Optional.ofNullable(itemSpawner.getTeam()).map(Team::getName).orElse("no team"),
                                                                                             "hologramEnabled", itemSpawner.isHologramEnabled(),
                                                                                             "floatingEnabled", itemSpawner.isFloatingBlockEnabled(),
-                                                                                            "rotationMode", itemSpawner.getRotationMode(),
+                                                                                            "rotationMode", ((ItemSpawnerImpl) itemSpawner).getRotationMode(),
                                                                                             "hologramType", itemSpawner.getHologramType()
                                                                                     )).collect(Collectors.toList()),
-                                                                                    "teams", game.getTeams().stream().map(team -> nullValuesAllowingMap(
+                                                                                    "teams", game.getAvailableTeams().stream().map(team -> nullValuesAllowingMap(
                                                                                             "name", team.getName(),
                                                                                             "color", team.getColor(),
                                                                                             "spawn", team.getTeamSpawn(),
@@ -160,7 +162,7 @@ public class DumpCommand extends BaseCommand {
                                                                                             "baby", gameStore.isBaby(),
                                                                                             "skinName", gameStore.getSkinName()
                                                                                     )).collect(Collectors.toList()),
-                                                                                    "configurationContainer", ConfigurateUtils.toMap(game.getConfigurationContainer().getSaved())
+                                                                                    "configurationContainer", ConfigurateUtils.toMap(((GameConfigurationContainer) game.getConfigurationContainer()).getSaved())
                                                                             )
                                                                     )
                                                             ).collect(Collectors.toList())))
@@ -213,6 +215,7 @@ public class DumpCommand extends BaseCommand {
                                     GameManagerImpl.getInstance()
                                             .getGames()
                                             .stream()
+                                            .map(game -> (GameImpl) game)
                                             .map(GameImpl::getGameStores)
                                             .flatMap(Collection::stream)
                                             .map(GameStore::getShopFile)

@@ -4,6 +4,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import net.kyori.adventure.sound.Sound;
 import org.screamingsandals.bedwars.BedWarsPlugin;
+import org.screamingsandals.bedwars.api.Team;
 import org.screamingsandals.bedwars.api.special.PopUpTower;
 import org.screamingsandals.bedwars.game.GameImpl;
 import org.screamingsandals.bedwars.game.TeamImpl;
@@ -23,7 +24,7 @@ import java.util.stream.Collectors;
 
 @Getter
 @EqualsAndHashCode(callSuper = true)
-public class PopUpTowerImpl extends SpecialItem implements PopUpTower<GameImpl, BedWarsPlayer, TeamImpl> {
+public class PopUpTowerImpl extends SpecialItem implements PopUpTower {
     private final static List<BlockFace> pillarSides = List.of(BlockFace.NORTH, BlockFace.EAST, BlockFace.WEST, BlockFace.SOUTH);
 
     private final BlockTypeHolder material;
@@ -59,7 +60,8 @@ public class PopUpTowerImpl extends SpecialItem implements PopUpTower<GameImpl, 
     public void runTask() {
         targetBlocks = game.getActiveTeams()
                 .stream()
-                .map(TeamImpl::getTargetBlock)
+                .map(Team::getTargetBlock)
+                .map(targetBlock -> targetBlock.as(LocationHolder.class))
                 .collect(Collectors.toList());
 
 

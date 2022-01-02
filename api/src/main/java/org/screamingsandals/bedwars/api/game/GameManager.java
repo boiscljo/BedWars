@@ -7,24 +7,24 @@ import java.util.Optional;
 import java.util.UUID;
 
 @ApiStatus.NonExtendable
-public interface GameManager<T extends Game<?, ?, ?, ?, ?, ?, ?, ?, ?>> {
+public interface GameManager {
     /**
      * @param name Name of game or string representation of an uuid
      * @return Optional with game or empty if game does not exist
      * @see #getGame(UUID)
      */
-    Optional<T> getGame(String name);
+    Optional<Game> getGame(String name);
 
     /**
      * @param uuid Unique id of the game
      * @return Optional with the game or empty if the game does not exist
      */
-    Optional<T> getGame(UUID uuid);
+    Optional<Game> getGame(UUID uuid);
 
     /**
      * @return List of available games
      */
-    List<T> getGames();
+    List<Game> getGames();
 
     /**
      * @return List of names of all game
@@ -46,36 +46,36 @@ public interface GameManager<T extends Game<?, ?, ?, ?, ?, ?, ?, ?, ?>> {
     /**
      * @return Free game that has the highest players in it or empty optional
      */
-    Optional<T> getGameWithHighestPlayers(boolean fee);
+    Optional<Game> getGameWithHighestPlayers(boolean fee);
 
     /**
      * @return Free game that has the lowest players in it or empty optional
      */
-    Optional<T> getGameWithLowestPlayers(boolean fee);
+    Optional<Game> getGameWithLowestPlayers(boolean fee);
 
     /**
      * @return Game in waiting state or empty optional
      */
-    Optional<T> getFirstWaitingGame(boolean fee);
+    Optional<Game> getFirstWaitingGame(boolean fee);
 
     /**
      * @return Game in running state or empty optional
      */
-    Optional<T> getFirstRunningGame(boolean fee);
+    Optional<Game> getFirstRunningGame(boolean fee);
 
-    default Optional<T> getGameWithHighestPlayers() {
+    default Optional<Game> getGameWithHighestPlayers() {
         return getGameWithHighestPlayers(true);
     }
 
-    default Optional<T> getGameWithLowestPlayers() {
+    default Optional<Game> getGameWithLowestPlayers() {
         return getGameWithLowestPlayers(true);
     }
 
-    default Optional<T> getFirstWaitingGame() {
+    default Optional<Game> getFirstWaitingGame() {
         return getFirstWaitingGame(true);
     }
 
-    default Optional<T> getFirstRunningGame() {
+    default Optional<Game> getFirstRunningGame() {
         return getFirstRunningGame(true);
     }
 }

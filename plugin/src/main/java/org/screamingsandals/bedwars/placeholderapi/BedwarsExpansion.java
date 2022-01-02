@@ -4,15 +4,19 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.screamingsandals.bedwars.api.game.Game;
 import org.screamingsandals.bedwars.api.game.GameStatus;
 import org.screamingsandals.bedwars.game.GameImpl;
 import org.screamingsandals.bedwars.game.GameManagerImpl;
+import org.screamingsandals.bedwars.game.TeamColorImpl;
 import org.screamingsandals.bedwars.player.PlayerManagerImpl;
 import org.screamingsandals.bedwars.statistics.PlayerStatisticManager;
 import org.screamingsandals.lib.placeholders.PlaceholderExpansion;
 import org.screamingsandals.lib.player.PlayerMapper;
 import org.screamingsandals.lib.sender.MultiPlatformOfflinePlayer;
+import org.screamingsandals.lib.utils.adventure.wrapper.ComponentWrapper;
 import org.screamingsandals.lib.utils.annotations.Service;
+import org.screamingsandals.lib.world.WorldHolder;
 
 @Service(dependsOn = {
         PlayerMapper.class
@@ -43,7 +47,7 @@ public class BedwarsExpansion extends PlaceholderExpansion {
                     case "name":
                         return Component.text(game.getName());
                     case "displayName":
-                        return game.getDisplayNameComponent().asComponent();
+                        return ((ComponentWrapper) game.getDisplayNameComponent()).asComponent();
                     case "players":
                         return Component.text(game.countConnectedPlayers());
                     case "maxplayers":
@@ -51,7 +55,7 @@ public class BedwarsExpansion extends PlaceholderExpansion {
                     case "minplayers":
                         return Component.text(game.getMinPlayers());
                     case "world":
-                        return Component.text(game.getWorld().getName());
+                        return Component.text(game.getGameWorld().as(WorldHolder.class).getName());
                     case "state":
                         return Component.text(game.getStatus().name().toLowerCase());
                     case "available_teams":
@@ -116,20 +120,20 @@ public class BedwarsExpansion extends PlaceholderExpansion {
             // current game
             switch (identifier.toLowerCase().substring(8)) {
                 case "game":
-                    return Component.text(PlayerManagerImpl.getInstance().getGameOfPlayer(player.getUuid()).map(GameImpl::getName).orElse("none"));
+                    return Component.text(PlayerManagerImpl.getInstance().getGameOfPlayer(player.getUuid()).map(Game::getName).orElse("none"));
                 case "game_players":
                     return PlayerManagerImpl.getInstance().getGameOfPlayer(player.getUuid()).map(g -> Component.text(g.countConnectedPlayers())).orElseGet(() -> Component.text("0"));
                 case "game_time":
                     var m_Game = PlayerManagerImpl.getInstance().getGameOfPlayer(player.getUuid());
                     if (m_Game.isEmpty() || m_Game.get().getStatus() != GameStatus.RUNNING)
                         return Component.text("0");
-                    return Component.text(m_Game.get().getFormattedTimeLeft());
+                    return Component.text(m_Game.map(game -> (GameImpl) game).get().getFormattedTimeLeft());
                 case "game_maxplayers":
                     return PlayerManagerImpl.getInstance().getGameOfPlayer(player.getUuid()).map(g -> Component.text(g.getMaxPlayers())).orElseGet(() -> Component.text("0"));
                 case "game_minplayers":
                     return PlayerManagerImpl.getInstance().getGameOfPlayer(player.getUuid()).map(g -> Component.text(g.getMinPlayers())).orElseGet(() -> Component.text("0"));
                 case "game_world":
-                    return Component.text(PlayerManagerImpl.getInstance().getGameOfPlayer(player.getUuid()).map(g -> g.getWorld().getName()).orElse("none"));
+                    return Component.text(PlayerManagerImpl.getInstance().getGameOfPlayer(player.getUuid()).map(g -> g.getGameWorld().as(WorldHolder.class).getName()).orElse("none"));
                 case "game_state":
                     return Component.text(PlayerManagerImpl.getInstance().getGameOfPlayer(player.getUuid()).map(g -> g.getStatus().name().toLowerCase()).orElse("none"));
                 case "available_teams":
@@ -145,7 +149,7 @@ public class BedwarsExpansion extends PlaceholderExpansion {
                         if (gPlayer.isSpectator()) {
                             return Component.text("spectator");
                         } else {
-                            var team = game.getPlayerTeam(gPlayer);
+                            var team = game.getTeamOfPlayer(gPlayer);
                             if (team != null) {
                                 return Component.text(team.getName());
                             } else {
@@ -162,9 +166,9 @@ public class BedwarsExpansion extends PlaceholderExpansion {
                         if (gPlayer.isSpectator()) {
                             return Component.text("spectator", NamedTextColor.GRAY);
                         } else {
-                            var team = game.getPlayerTeam(gPlayer);
+                            var team = game.getTeamOfPlayer(gPlayer);
                             if (team != null) {
-                                return Component.text(team.getName(), team.getColor().getTextColor());
+                                return Component.text(team.getName(), ((TeamColorImpl) team.getColor()).getTextColor());
                             } else {
                                 return Component.text("none", NamedTextColor.RED);
                             }
@@ -179,9 +183,9 @@ public class BedwarsExpansion extends PlaceholderExpansion {
                         if (gPlayer.isSpectator()) {
                             return Component.text("", NamedTextColor.GRAY);
                         } else {
-                            var team = game.getPlayerTeam(gPlayer);
+                            var team = game.getTeamOfPlayer(gPlayer);
                             if (team != null) {
-                                return Component.text("", team.getColor().getTextColor());
+                                return Component.text("", ((TeamColorImpl) team.getColor()).getTextColor());
                             } else {
                                 return Component.text("", NamedTextColor.GRAY);
                             }
@@ -196,7 +200,7 @@ public class BedwarsExpansion extends PlaceholderExpansion {
                         if (gPlayer.isSpectator()) {
                             return Component.text("0");
                         } else {
-                            var team = game.getPlayerTeam(gPlayer);
+                            var team = game.getTeamOfPlayer(gPlayer);
                             if (team != null) {
                                 return Component.text(team.countConnectedPlayers());
                             } else {
@@ -213,7 +217,7 @@ public class BedwarsExpansion extends PlaceholderExpansion {
                         if (gPlayer.isSpectator()) {
                             return Component.text("0");
                         } else {
-                            var team = game.getPlayerTeam(gPlayer);
+                            var team = game.getTeamOfPlayer(gPlayer);
                             if (team != null) {
                                 return Component.text(team.getMaxPlayers());
                             } else {
@@ -230,7 +234,7 @@ public class BedwarsExpansion extends PlaceholderExpansion {
                         if (gPlayer.isSpectator()) {
                             return Component.text("no");
                         } else {
-                            var team = game.getPlayerTeam(gPlayer);
+                            var team = game.getTeamOfPlayer(gPlayer);
                             if (team != null) {
                                 return Component.text(team.isTargetBlockIntact() ? "yes" : "no");
                             } else {
@@ -247,7 +251,7 @@ public class BedwarsExpansion extends PlaceholderExpansion {
                         if (gPlayer.isSpectator()) {
                             return Component.text("0");
                         } else {
-                            var team = game.getPlayerTeam(gPlayer);
+                            var team = game.getTeamOfPlayer(gPlayer);
                             if (team != null) {
                                 return Component.text(team.countTeamChests());
                             } else {

@@ -18,7 +18,7 @@ import org.screamingsandals.lib.tasker.task.TaskerTask;
 
 @Getter
 @EqualsAndHashCode(callSuper = true)
-public class WarpPowderImpl extends SpecialItem implements WarpPowder<GameImpl, BedWarsPlayer, TeamImpl, Item> {
+public class WarpPowderImpl extends SpecialItem implements WarpPowder {
     private final Item item;
     private TaskerTask teleportingTask;
     private int teleportingTime;

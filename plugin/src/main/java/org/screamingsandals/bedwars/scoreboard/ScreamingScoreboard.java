@@ -6,8 +6,10 @@ import org.screamingsandals.bedwars.api.config.ConfigurationContainer;
 import org.screamingsandals.bedwars.api.game.GameStatus;
 import org.screamingsandals.bedwars.config.MainConfig;
 import org.screamingsandals.bedwars.game.GameImpl;
+import org.screamingsandals.bedwars.game.TeamColorImpl;
 import org.screamingsandals.bedwars.game.TeamImpl;
 import org.screamingsandals.bedwars.listener.Player116ListenerUtils;
+import org.screamingsandals.bedwars.player.BedWarsPlayer;
 import org.screamingsandals.lib.lang.Message;
 import org.screamingsandals.lib.player.PlayerWrapper;
 import org.screamingsandals.lib.sidebar.ScoreSidebar;
@@ -17,6 +19,7 @@ import org.screamingsandals.lib.tasker.Tasker;
 import org.screamingsandals.lib.tasker.TaskerTime;
 import org.screamingsandals.lib.tasker.task.TaskerTask;
 import org.screamingsandals.lib.utils.AdventureHelper;
+import org.screamingsandals.lib.world.LocationHolder;
 import org.spongepowered.configurate.ConfigurationNode;
 
 import java.util.*;
@@ -70,11 +73,11 @@ public class ScreamingScoreboard {
         final var msgs = new ArrayList<Message>();
         game.getActiveTeams().forEach(team ->
                 msgs.add(Message.ofPlainText(() ->
-                                List.of(formatScoreboardTeam(team,
+                                List.of(formatScoreboardTeam((TeamImpl) team,
                                         !team.isTargetBlockIntact(),
                                         team.isTargetBlockIntact()
-                                                && team.getTargetBlock().getBlock().getType().isSameType("respawn_anchor")
-                                                && Player116ListenerUtils.isAnchorEmpty(team.getTargetBlock().getBlock()))
+                                                && team.getTargetBlock().as(LocationHolder.class).getBlock().getType().isSameType("respawn_anchor")
+                                                && Player116ListenerUtils.isAnchorEmpty(team.getTargetBlock().as(LocationHolder.class).getBlock()))
                                 )
                         )
                 )
@@ -140,7 +143,7 @@ public class ScreamingScoreboard {
         game.getActiveTeams().forEach(team -> {
             if (teamedSidebar.getTeam(team.getName()).isEmpty()) {
                 teamedSidebar.team(team.getName())
-                        .color(NamedTextColor.nearestTo(team.getColor().getTextColor()))
+                        .color(NamedTextColor.nearestTo(((TeamColorImpl) team.getColor()).getTextColor()))
                         .friendlyFire(game.getConfigurationContainer().getOrDefault(ConfigurationContainer.FRIENDLY_FIRE, Boolean.class, false));
             }
             var sidebarTeam = teamedSidebar.getTeam(team.getName()).orElseThrow();
@@ -154,6 +157,7 @@ public class ScreamingScoreboard {
 
             team.getPlayers()
                     .stream()
+                    .map(bwPlayer -> (BedWarsPlayer) bwPlayer)
                     .filter(player -> !sidebarTeam.players().contains(player))
                     .forEach(sidebarTeam::player);
         });
@@ -182,7 +186,7 @@ public class ScreamingScoreboard {
 
     private void updateScoreboard() {
         game.getActiveTeams().forEach(team -> {
-            scoreboard.entity(team.getName(), formatScoreboardTeamOld(team, !team.isTargetBlockIntact(), team.isTargetBlockIntact() && team.getTargetBlock().getBlock().getType().isSameType("respawn_anchor") && Player116ListenerUtils.isAnchorEmpty(team.getTargetBlock().getBlock())));
+            scoreboard.entity(team.getName(), formatScoreboardTeamOld((TeamImpl) team, !team.isTargetBlockIntact(), team.isTargetBlockIntact() && team.getTargetBlock().as(LocationHolder.class).getBlock().getType().isSameType("respawn_anchor") && Player116ListenerUtils.isAnchorEmpty(team.getTargetBlock().as(LocationHolder.class).getBlock())));
             scoreboard.score(team.getName(), team.countConnectedPlayers());
         });
     }

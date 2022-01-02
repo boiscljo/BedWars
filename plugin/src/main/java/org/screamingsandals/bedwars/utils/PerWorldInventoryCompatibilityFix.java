@@ -24,7 +24,7 @@ public class PerWorldInventoryCompatibilityFix {
                         public void onInventoryChange(me.ebonjaeger.perworldinventory.event.InventoryLoadEvent event) {
                             var player = event.getPlayer();
                             if (PlayerManagerImpl.getInstance().isPlayerInGame(player.getUniqueId())) {
-                                BedWarsPlayer gPlayer = PlayerManagerImpl.getInstance().getPlayer(player.getUniqueId()).orElseThrow();
+                                BedWarsPlayer gPlayer = (BedWarsPlayer) PlayerManagerImpl.getInstance().getPlayer(player.getUniqueId()).orElseThrow();
                                 if (gPlayer.getGame() != null || gPlayer.isTeleportingFromGame_justForInventoryPlugins) {
                                     gPlayer.isTeleportingFromGame_justForInventoryPlugins = false;
                                     event.setCancelled(true);
@@ -39,7 +39,7 @@ public class PerWorldInventoryCompatibilityFix {
                         public void onInventoryChange(me.gnat008.perworldinventory.events.InventoryLoadEvent event) {
                             var player = event.getPlayer();
                             if (PlayerManagerImpl.getInstance().isPlayerInGame(player.getUniqueId())) {
-                                BedWarsPlayer gPlayer = PlayerManagerImpl.getInstance().getPlayer(player.getUniqueId()).orElseThrow();
+                                BedWarsPlayer gPlayer = (BedWarsPlayer) PlayerManagerImpl.getInstance().getPlayer(player.getUniqueId()).orElseThrow();
                                 if (gPlayer.getGame() != null || gPlayer.isTeleportingFromGame_justForInventoryPlugins) {
                                     gPlayer.isTeleportingFromGame_justForInventoryPlugins = false;
                                     event.setCancelled(true);

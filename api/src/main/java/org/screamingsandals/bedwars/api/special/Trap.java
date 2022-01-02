@@ -10,11 +10,11 @@ import org.screamingsandals.lib.utils.Wrapper;
  * @author Bedwars Team
  */
 @ApiStatus.NonExtendable
-public interface Trap<G extends Game, P extends BWPlayer, T extends Team, L extends Wrapper> extends SpecialItem<G, P, T> {
+public interface Trap extends SpecialItem {
     /**
      * @return
      */
-	L getLocation();
+    Wrapper getLocation();
 
     /**
      * @return

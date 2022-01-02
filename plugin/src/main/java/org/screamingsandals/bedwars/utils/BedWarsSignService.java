@@ -7,6 +7,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
 import org.screamingsandals.bedwars.commands.BedWarsPermission;
 import org.screamingsandals.bedwars.config.MainConfig;
+import org.screamingsandals.bedwars.game.GameImpl;
 import org.screamingsandals.bedwars.game.GameManagerImpl;
 import org.screamingsandals.bedwars.lang.LangKeys;
 import org.screamingsandals.bedwars.player.PlayerManagerImpl;
@@ -72,7 +73,7 @@ public class BedWarsSignService extends AbstractSignManager {
     protected void updateSign(ClickableSign sign) {
         var name = sign.getKey();
         gameManager.getGame(name).ifPresentOrElse(game ->
-                        Tasker.build(game::updateSigns)
+                        Tasker.build(() -> ((GameImpl) game).updateSigns())
                                 .afterOneTick()
                                 .start(),
                 () -> {

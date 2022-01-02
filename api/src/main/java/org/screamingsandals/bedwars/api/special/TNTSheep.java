@@ -11,21 +11,21 @@ import org.screamingsandals.lib.utils.Wrapper;
  *
  */
 @ApiStatus.NonExtendable
-public interface TNTSheep<G extends Game, P extends BWPlayer, T extends Team, E extends Wrapper, L extends Wrapper, LE extends Wrapper> extends SpecialItem<G, P, T> {
+public interface TNTSheep extends SpecialItem {
 	/**
 	 * @return
 	 */
-	LE getEntity();
+	Wrapper getEntity();
 
 	/**
 	 * @return
 	 */
-	L getInitialLocation();
+	Wrapper getInitialLocation();
 	
 	/**
 	 * @return
 	 */
-	E getTnt();
+	Wrapper getTnt();
 	
 	/**
 	 * @return

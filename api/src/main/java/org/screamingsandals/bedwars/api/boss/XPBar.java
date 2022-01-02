@@ -7,7 +7,7 @@ import org.screamingsandals.lib.utils.Wrapper;
  * @author Bedwars Team
  */
 @ApiStatus.NonExtendable
-public interface XPBar<P extends Wrapper> extends StatusBar<P> {
+public interface XPBar extends StatusBar {
     /**
      * @param seconds
      */

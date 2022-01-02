@@ -7,8 +7,8 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.screamingsandals.bedwars.BedWarsPlugin;
+import org.screamingsandals.bedwars.api.game.Game;
 import org.screamingsandals.bedwars.api.game.GameStatus;
-import org.screamingsandals.bedwars.game.GameImpl;
 import org.screamingsandals.bedwars.game.GameManagerImpl;
 import org.screamingsandals.bedwars.lang.LangKeys;
 import org.screamingsandals.lib.lang.Message;
@@ -40,7 +40,7 @@ public class ReloadCommand extends BaseCommand {
         sender.sendMessage(Message.of(LangKeys.SAFE_RELOAD).defaultPrefix());
 
         for (var game : GameManagerImpl.getInstance().getGameNames()) {
-            GameManagerImpl.getInstance().getGame(game).ifPresent(GameImpl::stop);
+            GameManagerImpl.getInstance().getGame(game).ifPresent(Game::stop);
         }
 
         var logger = BedWarsPlugin.getInstance().getLogger();

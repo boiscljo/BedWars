@@ -10,7 +10,7 @@ import org.screamingsandals.lib.utils.Wrapper;
  * @author Bedwars Team
  */
 @ApiStatus.NonExtendable
-public interface LuckyBlock<G extends Game, P extends BWPlayer, T extends Team, L extends Wrapper> extends SpecialItem<G, P, T> {
+public interface LuckyBlock extends SpecialItem {
     /**
      * @return
      */
@@ -19,5 +19,5 @@ public interface LuckyBlock<G extends Game, P extends BWPlayer, T extends Team, 
     /**
      * @return
      */
-    L getBlockLocation();
+    Wrapper getBlockLocation();
 }

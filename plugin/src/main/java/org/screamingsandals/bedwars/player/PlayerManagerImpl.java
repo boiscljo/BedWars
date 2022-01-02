@@ -1,6 +1,8 @@
 package org.screamingsandals.bedwars.player;
 
 import lombok.RequiredArgsConstructor;
+import org.screamingsandals.bedwars.api.game.Game;
+import org.screamingsandals.bedwars.api.player.BWPlayer;
 import org.screamingsandals.bedwars.api.player.PlayerManager;
 import org.screamingsandals.bedwars.game.GameImpl;
 import org.screamingsandals.bedwars.game.GameManagerImpl;
@@ -18,7 +20,7 @@ import java.util.UUID;
         GameManagerImpl.class
 })
 @RequiredArgsConstructor
-public class PlayerManagerImpl implements PlayerManager<BedWarsPlayer, GameImpl> {
+public class PlayerManagerImpl implements PlayerManager {
     private final List<BedWarsPlayer> players = new ArrayList<>();
 
     {
@@ -41,7 +43,8 @@ public class PlayerManagerImpl implements PlayerManager<BedWarsPlayer, GameImpl>
                 });
     }
 
-    public Optional<BedWarsPlayer> getPlayer(UUID uuid) {
+    @Override
+    public Optional<BWPlayer> getPlayer(UUID uuid) {
         return PlayerMapper.getPlayer(uuid).flatMap(this::getPlayer);
     }
 
@@ -73,11 +76,11 @@ public class PlayerManagerImpl implements PlayerManager<BedWarsPlayer, GameImpl>
     }
 
     @Override
-    public Optional<GameImpl> getGameOfPlayer(UUID uuid) {
-        return getPlayer(uuid).map(BedWarsPlayer::getGame);
+    public Optional<Game> getGameOfPlayer(UUID uuid) {
+        return getPlayer(uuid).map(BWPlayer::getGame);
     }
 
-    public Optional<GameImpl> getGameOfPlayer(PlayerWrapper playerWrapper) {
+    public Optional<Game> getGameOfPlayer(PlayerWrapper playerWrapper) {
         return getPlayer(playerWrapper).map(BedWarsPlayer::getGame);
     }
 }

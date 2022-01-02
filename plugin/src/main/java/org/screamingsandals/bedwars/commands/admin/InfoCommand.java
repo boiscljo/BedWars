@@ -4,13 +4,23 @@ import cloud.commandframework.Command;
 import cloud.commandframework.CommandManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
+import org.bukkit.entity.Boss;
 import org.screamingsandals.bedwars.commands.AdminCommand;
+import org.screamingsandals.bedwars.game.GameImpl;
 import org.screamingsandals.bedwars.game.GameManagerImpl;
+import org.screamingsandals.bedwars.game.TeamColorImpl;
 import org.screamingsandals.bedwars.lang.LangKeys;
+import org.screamingsandals.lib.entity.type.EntityTypeHolder;
 import org.screamingsandals.lib.lang.Message;
 import org.screamingsandals.lib.sender.CommandSenderWrapper;
 import org.screamingsandals.lib.utils.AdventureHelper;
+import org.screamingsandals.lib.utils.BasicWrapper;
+import org.screamingsandals.lib.utils.adventure.wrapper.BossBarColorWrapper;
+import org.screamingsandals.lib.utils.adventure.wrapper.ComponentWrapper;
 import org.screamingsandals.lib.utils.annotations.Service;
+import org.screamingsandals.lib.world.LocationHolder;
+import org.screamingsandals.lib.world.WorldHolder;
+import org.screamingsandals.lib.world.weather.WeatherHolder;
 
 @Service
 public class InfoCommand extends BaseAdminSubCommand {
@@ -63,10 +73,10 @@ public class InfoCommand extends BaseAdminSubCommand {
                                         }
                                         return Component.empty(); //what??
                                     })
-                                    .placeholder("world", game.getWorld().getName())
+                                    .placeholder("world", game.getGameWorld().as(WorldHolder.class).getName())
                                     .send(sender);
 
-                            var loc_pos1 = game.getPos1();
+                            var loc_pos1 = game.getPos1().as(LocationHolder.class);
                             Message
                                     .of(LangKeys.ADMIN_INFO_POS1)
                                     .placeholder("x", loc_pos1.getX(), 2)
@@ -77,7 +87,7 @@ public class InfoCommand extends BaseAdminSubCommand {
                                     .placeholder("world", loc_pos1.getWorld().getName())
                                     .send(sender);
 
-                            var loc_pos2 = game.getPos2();
+                            var loc_pos2 = game.getPos2().as(LocationHolder.class);
                             Message
                                     .of(LangKeys.ADMIN_INFO_POS2)
                                     .placeholder("x", loc_pos2.getX(), 2)
@@ -88,7 +98,7 @@ public class InfoCommand extends BaseAdminSubCommand {
                                     .placeholder("world", loc_pos2.getWorld().getName())
                                     .send(sender);
 
-                            var loc_spec = game.getSpecSpawn();
+                            var loc_spec = game.getSpectatorSpawn().as(LocationHolder.class);
                             Message
                                     .of(LangKeys.ADMIN_INFO_SPEC)
                                     .placeholder("x", loc_spec.getX(), 2)
@@ -99,7 +109,7 @@ public class InfoCommand extends BaseAdminSubCommand {
                                     .placeholder("world", loc_spec.getWorld().getName())
                                     .send(sender);
 
-                            var loc_lobby = game.getLobbySpawn();
+                            var loc_lobby = game.getLobbySpawn().as(LocationHolder.class);
                             Message
                                     .of(LangKeys.ADMIN_INFO_LOBBY)
                                     .placeholder("x", loc_lobby.getX(), 2)
@@ -114,7 +124,7 @@ public class InfoCommand extends BaseAdminSubCommand {
                                     .of(LangKeys.ADMIN_INFO_MIN_PLAYERS)
                                     .join(LangKeys.ADMIN_INFO_LOBBY_COUNTDOWN)
                                     .placeholder("minplayers", game.getMinPlayers())
-                                    .placeholder("time", game.getPauseCountdown())
+                                    .placeholder("time", ((GameImpl) game).getPauseCountdown())
                                     .send(sender);
 
                             Message
@@ -151,14 +161,14 @@ public class InfoCommand extends BaseAdminSubCommand {
                                     .join(LangKeys.ADMIN_INFO_TEAMS)
                                     .send(sender);
 
-                            game.getTeams().forEach(team -> {
+                            game.getAvailableTeams().forEach(team -> {
                                 Message
                                         .of(LangKeys.ADMIN_INFO_TEAM)
-                                        .placeholder("team", Component.text(team.getName()).color(team.getColor().getTextColor()))
+                                        .placeholder("team", Component.text(team.getName()).color(((TeamColorImpl) team.getColor()).getTextColor()))
                                         .placeholder("maxplayers", team.getMaxPlayers())
                                         .send(sender);
 
-                                var loc_spawn = team.getTeamSpawn();
+                                var loc_spawn = team.getTeamSpawn().as(LocationHolder.class);
                                 Message
                                         .of(LangKeys.ADMIN_INFO_TEAM_SPAWN)
                                         .placeholder("x", loc_spawn.getX(), 2)
@@ -169,7 +179,7 @@ public class InfoCommand extends BaseAdminSubCommand {
                                         .placeholder("world", loc_spawn.getWorld().getName())
                                         .send(sender);
 
-                                var loc_target = team.getTargetBlock();
+                                var loc_target = team.getTargetBlock().as(LocationHolder.class);
                                 Message
                                         .of(LangKeys.ADMIN_INFO_TEAM_TARGET)
                                         .placeholder("x", loc_target.getX(), 2)
@@ -205,21 +215,21 @@ public class InfoCommand extends BaseAdminSubCommand {
                                     .prefixPolicy(Message.PrefixPolicy.FIRST_MESSAGE)
                                     .send(sender);
 
-                            game.getSpawners().forEach(spawner -> {
-                                var loc_spawner = spawner.getLocation();
+                            ((GameImpl) game).getSpawners().forEach(spawner -> {
+                                var loc_spawner = spawner.getLocation().as(LocationHolder.class);
                                 var team = spawner.getTeam();
 
                                 Component spawnerTeam;
 
                                 if (team != null) {
-                                    spawnerTeam = Component.text(team.getName()).color(team.getColor().getTextColor());
+                                    spawnerTeam = Component.text(team.getName()).color(((TeamColorImpl) team.getColor()).getTextColor());
                                 } else {
                                     spawnerTeam = Message.of(LangKeys.ADMIN_INFO_SPAWNER_NO_TEAM).asComponent(sender);
                                 }
 
                                 Message
                                         .of(LangKeys.ADMIN_INFO_SPAWNER)
-                                        .placeholder("resource", spawner.getItemSpawnerType().getItemName().asComponent())
+                                        .placeholder("resource", spawner.getItemSpawnerType().getItemName().as(ComponentWrapper.class).asComponent())
                                         .placeholder("x", loc_spawner.getBlockX())
                                         .placeholder("y", loc_spawner.getBlockY())
                                         .placeholder("z", loc_spawner.getBlockZ())
@@ -255,8 +265,8 @@ public class InfoCommand extends BaseAdminSubCommand {
                                     .prefixPolicy(Message.PrefixPolicy.FIRST_MESSAGE)
                                     .send(sender);
 
-                            game.getGameStoreList().forEach(store -> {
-                                var loc_store = store.getStoreLocation();
+                            game.getGameStores().forEach(store -> {
+                                var loc_store = store.getStoreLocation().as(LocationHolder.class);
                                 Message
                                         .of(LangKeys.ADMIN_INFO_VILLAGER_POS)
                                         .join(LangKeys.ADMIN_INFO_VILLAGER_ENTITY_TYPE)
@@ -266,7 +276,7 @@ public class InfoCommand extends BaseAdminSubCommand {
                                         .placeholder("yaw", loc_store.getYaw(), 5)
                                         .placeholder("pitch", loc_store.getPitch(), 5)
                                         .placeholder("world", loc_store.getWorld().getName())
-                                        .placeholder("type", store.getEntityType().platformName())
+                                        .placeholder("type", store.getEntityType().as(EntityTypeHolder.class).platformName())
                                         .send(sender);
 
                                 Message
@@ -363,19 +373,19 @@ public class InfoCommand extends BaseAdminSubCommand {
                             Message
                                     .of(LangKeys.ADMIN_INFO_CONSTANT)
                                     .placeholder("constant", "arenaWeather")
-                                    .placeholder("value", game.getArenaWeather().platformName())
+                                    .placeholder("value", game.getArenaWeather().as(WeatherHolder.class).platformName())
                                     .send(sender);
 
                             Message
                                     .of(LangKeys.ADMIN_INFO_CONSTANT)
                                     .placeholder("constant", "lobbybossbarcolor")
-                                    .placeholder("value", game.getLobbyBossBarColor() != null ? game.getLobbyBossBarColor().asBossBarColor().name() : "default")
+                                    .placeholder("value", game.getLobbyBossBarColor() != null ? game.getLobbyBossBarColor().as(BossBarColorWrapper.class).asBossBarColor().name() : "default")
                                     .send(sender);
 
                             Message
                                     .of(LangKeys.ADMIN_INFO_CONSTANT)
                                     .placeholder("constant", "gamebossbarcolor")
-                                    .placeholder("value", game.getGameBossBarColor() != null ? game.getGameBossBarColor().asBossBarColor().name() : "default")
+                                    .placeholder("value", ((BossBarColorWrapper) game.getGameBossBarColor()).asBossBarColor() != null ? game.getGameBossBarColor().as(BossBarColorWrapper.class).asBossBarColor().name() : "default")
                                     .send(sender);
                         })
         );

@@ -3,7 +3,9 @@ package org.screamingsandals.bedwars.special.listener;
 import org.screamingsandals.bedwars.api.config.ConfigurationContainer;
 import org.screamingsandals.bedwars.api.game.GameStatus;
 import org.screamingsandals.bedwars.events.ApplyPropertyToBoughtItemEventImpl;
+import org.screamingsandals.bedwars.game.GameImpl;
 import org.screamingsandals.bedwars.game.GameManagerImpl;
+import org.screamingsandals.bedwars.game.TeamImpl;
 import org.screamingsandals.bedwars.lang.LangKeys;
 import org.screamingsandals.bedwars.player.BedWarsPlayer;
 import org.screamingsandals.bedwars.player.PlayerManagerImpl;
@@ -98,7 +100,7 @@ public class GolemListener {
                         if (event.getDamager() instanceof PlayerWrapper) {
                             var player = (PlayerWrapper) event.getDamager();
                             if (PlayerManagerImpl.getInstance().isPlayerInGame(player)) {
-                                if (golem.getTeam() != game.getPlayerTeam(player.as(BedWarsPlayer.class))) {
+                                if (golem.getTeam() != game.getTeamOfPlayer(player.as(BedWarsPlayer.class))) {
                                     return;
                                 }
                             }
@@ -107,7 +109,7 @@ public class GolemListener {
                             if (shooter instanceof PlayerWrapper) {
                                 var player = (PlayerWrapper) shooter;
                                 if (PlayerManagerImpl.getInstance().isPlayerInGame(player)) {
-                                    if (golem.getTeam() != game.getPlayerTeam(player.as(BedWarsPlayer.class))) {
+                                    if (golem.getTeam() != game.getTeamOfPlayer(player.as(BedWarsPlayer.class))) {
                                         return;
                                     }
                                 }
@@ -143,10 +145,10 @@ public class GolemListener {
                                     return;
                                 }
 
-                                if (item.getTeam() == game.getPlayerTeam(gPlayer)) {
+                                if (item.getTeam() == game.getTeamOfPlayer(gPlayer)) {
                                     event.setCancelled(true);
                                     // Try to find enemy
-                                    var playerTarget = MiscUtils.findTarget(game, player, item.getFollowRange());
+                                    var playerTarget = MiscUtils.findTarget((GameImpl) game, player, item.getFollowRange());
                                     if (playerTarget != null) {
                                         // Oh. We found enemy!
                                         ironGolem.as(EntityPathfindingMob.class).setCurrentTarget(playerTarget);

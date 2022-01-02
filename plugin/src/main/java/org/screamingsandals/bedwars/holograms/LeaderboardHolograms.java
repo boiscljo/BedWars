@@ -48,7 +48,7 @@ public class LeaderboardHolograms {
 
     private ArrayList<SerializableLocation> hologramLocations;
     private Map<LocationHolder, Hologram> holograms;
-    private List<LeaderboardEntry<OfflinePlayerWrapper>> entries;
+    private List<LeaderboardEntry> entries;
 
     @ShouldRunControllable
     public static boolean isEnabled() {
@@ -176,7 +176,7 @@ public class LeaderboardHolograms {
             var l = new AtomicInteger(1);
             entries.forEach(leaderboardEntry ->
                     lines.add(line
-                            .replace("%name%", leaderboardEntry.getPlayer().getLastName().orElse(leaderboardEntry.getPlayer().getUuid().toString()))
+                            .replace("%name%", leaderboardEntry.getPlayer().as(PlayerWrapper.class).getLastName().orElse(leaderboardEntry.getPlayer().as(PlayerWrapper.class).getUuid().toString()))
                             .replace("%score%", Integer.toString(leaderboardEntry.getTotalScore()))
                             .replace("%order%", Integer.toString(l.getAndIncrement()))
                     )

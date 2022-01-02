@@ -6,10 +6,12 @@ import cloud.commandframework.arguments.standard.IntegerArgument;
 import org.screamingsandals.bedwars.BedWarsPlugin;
 import org.screamingsandals.bedwars.api.game.GameStatus;
 import org.screamingsandals.bedwars.config.MainConfig;
+import org.screamingsandals.bedwars.game.GameImpl;
 import org.screamingsandals.bedwars.game.GameManagerImpl;
 import org.screamingsandals.bedwars.lang.LangKeys;
 import org.screamingsandals.bedwars.player.BedWarsPlayer;
 import org.screamingsandals.bedwars.player.PlayerManagerImpl;
+import org.screamingsandals.bedwars.region.BWRegion;
 import org.screamingsandals.bedwars.special.PopUpTowerImpl;
 import org.screamingsandals.bedwars.utils.MiscUtils;
 import org.screamingsandals.lib.Server;
@@ -58,7 +60,7 @@ public class CheatCommand extends BaseCommand {
                         var arenaN = game.get();
                         GameManagerImpl.getInstance().getGame(arenaN).ifPresentOrElse(
                                 game1 -> {
-                                    var popupT = new PopUpTowerImpl(game1, playerManager.getPlayerOrCreate(player), null, BlockTypeHolder.of("minecraft:white_wool"), player.getLocation().getBlock().getLocation().add(playerFace).add(BlockFace.DOWN), playerFace);
+                                    var popupT = new PopUpTowerImpl((GameImpl) game1, playerManager.getPlayerOrCreate(player), null, BlockTypeHolder.of("minecraft:white_wool"), player.getLocation().getBlock().getLocation().add(playerFace).add(BlockFace.DOWN), playerFace);
                                     popupT.runTask();
                                     player.sendMessage(Message.of(LangKeys.IN_GAME_CHEAT_SPECIAL_ITEM_USED).placeholder("item", "Pop-Up Tower").defaultPrefix());
                                 },
@@ -89,7 +91,7 @@ public class CheatCommand extends BaseCommand {
                         var arenaN = game.get();
                         GameManagerImpl.getInstance().getGame(arenaN).ifPresentOrElse(
                                 game1 -> {
-                                    game1.getRegion().regen();
+                                    ((BWRegion) game1.getRegion()).regen();
                                 },
                                 () -> player.sendMessage(Message.of(LangKeys.IN_GAME_ERRORS_GAME_NOT_FOUND).defaultPrefix())
                         );

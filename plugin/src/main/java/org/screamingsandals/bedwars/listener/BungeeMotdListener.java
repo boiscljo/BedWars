@@ -4,6 +4,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.server.ServerListPingEvent;
 import org.bukkit.plugin.Plugin;
+import org.screamingsandals.bedwars.api.game.Game;
 import org.screamingsandals.bedwars.config.MainConfig;
 import org.screamingsandals.bedwars.game.GameImpl;
 import org.screamingsandals.bedwars.game.GameManagerImpl;
@@ -30,7 +31,7 @@ public class BungeeMotdListener implements Listener {
             return;
         }
 
-        GameImpl game = games.get(0);
+        Game game = games.get(0);
 
         if (game == null) {
             return;

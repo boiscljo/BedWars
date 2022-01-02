@@ -9,7 +9,7 @@ import org.screamingsandals.bedwars.api.player.BWPlayer;
  * @author Bedwars Team
  */
 @ApiStatus.NonExtendable
-public interface ArrowBlocker<G extends Game, P extends BWPlayer, T extends Team> extends SpecialItem<G, P, T> {
+public interface ArrowBlocker extends SpecialItem {
     /**
      * @return
      */

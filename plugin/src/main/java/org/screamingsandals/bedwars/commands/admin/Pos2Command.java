@@ -7,6 +7,7 @@ import org.screamingsandals.lib.lang.Message;
 import org.screamingsandals.lib.player.PlayerWrapper;
 import org.screamingsandals.lib.sender.CommandSenderWrapper;
 import org.screamingsandals.lib.utils.annotations.Service;
+import org.screamingsandals.lib.world.LocationHolder;
 
 @Service
 public class Pos2Command extends BaseAdminSubCommand {
@@ -29,7 +30,7 @@ public class Pos2Command extends BaseAdminSubCommand {
                                 return;
                             }
                             if (game.getPos1() != null) {
-                                if (Math.abs(game.getPos1().getBlockY() - loc.getBlockY()) <= 5) {
+                                if (Math.abs(game.getPos1().as(LocationHolder.class).getBlockY() - loc.getBlockY()) <= 5) {
                                     sender.sendMessage(Message.of(LangKeys.ADMIN_ARENA_EDIT_ERRORS_INVALID_BOUNDS).defaultPrefix());
                                     return;
                                 }

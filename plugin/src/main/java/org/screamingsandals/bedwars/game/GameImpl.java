@@ -10,11 +10,14 @@ import net.kyori.adventure.title.Title;
 import org.jetbrains.annotations.Nullable;
 import org.screamingsandals.bedwars.BedWarsPlugin;
 import org.screamingsandals.bedwars.api.ArenaTime;
+import org.screamingsandals.bedwars.api.Team;
 import org.screamingsandals.bedwars.api.boss.StatusBar;
 import org.screamingsandals.bedwars.api.config.ConfigurationContainer;
 import org.screamingsandals.bedwars.api.game.Game;
 import org.screamingsandals.bedwars.api.game.GameStatus;
+import org.screamingsandals.bedwars.api.game.GameStore;
 import org.screamingsandals.bedwars.api.game.ItemSpawner;
+import org.screamingsandals.bedwars.api.player.BWPlayer;
 import org.screamingsandals.bedwars.api.special.SpecialItem;
 import org.screamingsandals.bedwars.api.upgrades.UpgradeRegistry;
 import org.screamingsandals.bedwars.api.upgrades.UpgradeStorage;
@@ -56,6 +59,7 @@ import org.screamingsandals.lib.container.type.InventoryTypeHolder;
 import org.screamingsandals.lib.entity.EntityBasic;
 import org.screamingsandals.lib.entity.EntityItem;
 import org.screamingsandals.lib.entity.EntityLiving;
+import org.screamingsandals.lib.entity.EntityMapper;
 import org.screamingsandals.lib.entity.type.EntityTypeHolder;
 import org.screamingsandals.lib.event.EventManager;
 import org.screamingsandals.lib.event.player.SPlayerBlockBreakEvent;
@@ -74,6 +78,7 @@ import org.screamingsandals.lib.tasker.Tasker;
 import org.screamingsandals.lib.tasker.TaskerTime;
 import org.screamingsandals.lib.tasker.task.TaskerTask;
 import org.screamingsandals.lib.utils.AdventureHelper;
+import org.screamingsandals.lib.utils.Wrapper;
 import org.screamingsandals.lib.utils.adventure.wrapper.BossBarColorWrapper;
 import org.screamingsandals.lib.utils.adventure.wrapper.ComponentWrapper;
 import org.screamingsandals.lib.visuals.Visual;
@@ -96,7 +101,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class GameImpl implements Game<BedWarsPlayer, TeamImpl, BlockHolder, WorldHolder, LocationHolder, EntityBasic, ComponentWrapper, GameStoreImpl, ItemSpawnerImpl> {
+public class GameImpl implements Game {
     public boolean gameStartItem;
     @Getter
     private final UUID uuid;
@@ -146,9 +151,9 @@ public class GameImpl implements Game<BedWarsPlayer, TeamImpl, BlockHolder, Worl
     private final List<TeamImpl> teamsInGame = new ArrayList<>();
     private final BWRegion region = BedWarsPlugin.isLegacy() ? new LegacyRegion() : new FlatteningRegion();
     private TeamSelectorInventory teamSelectorInventory;
-    private StatusBar<PlayerWrapper> statusbar;
+    private StatusBar statusbar;
     private final Map<LocationHolder, Item[]> usedChests = new HashMap<>();
-    private final List<SpecialItem<?,?,?>> activeSpecialItems = new ArrayList<>();
+    private final List<SpecialItem> activeSpecialItems = new ArrayList<>();
     private final List<DelayFactory> activeDelays = new ArrayList<>();
     private final Map<BedWarsPlayer, Container> fakeEnderChests = new HashMap<>();
     private int postGameWaiting = 3;
@@ -537,7 +542,8 @@ public class GameImpl implements Game<BedWarsPlayer, TeamImpl, BlockHolder, Worl
         }
     }
 
-    public LocationHolder getPos1() {
+    @Override
+    public Wrapper getPos1() {
         return pos1;
     }
 
@@ -581,6 +587,7 @@ public class GameImpl implements Game<BedWarsPlayer, TeamImpl, BlockHolder, Worl
         return players.size() >= getMinPlayers();
     }
 
+    @Override
     public int countPlayers() {
         return this.players.size();
     }
@@ -602,7 +609,7 @@ public class GameImpl implements Game<BedWarsPlayer, TeamImpl, BlockHolder, Worl
     }
 
     @Override
-    public List<GameStoreImpl> getGameStores() {
+    public List<GameStore> getGameStores() {
         return List.copyOf(gameStore);
     }
 
@@ -848,7 +855,7 @@ public class GameImpl implements Game<BedWarsPlayer, TeamImpl, BlockHolder, Worl
                     team.setTargetBlockIntact(false);
                     Component coloredDestroyer = Component.text("explosion");
                     if (destroyer != null) {
-                        coloredDestroyer = destroyer.getDisplayName().color(getPlayerTeam(PlayerManagerImpl.getInstance().getPlayer(destroyer.getUuid()).orElseThrow()).getColor().getTextColor());
+                        coloredDestroyer = destroyer.getDisplayName().color(getPlayerTeam((BedWarsPlayer) PlayerManagerImpl.getInstance().getPlayer(destroyer.getUuid()).orElseThrow()).getColor().getTextColor());
                     }
                     for (BedWarsPlayer player : players) {
                         var message = Message
@@ -1318,7 +1325,7 @@ public class GameImpl implements Game<BedWarsPlayer, TeamImpl, BlockHolder, Worl
     }
 
     @Override
-    public void joinToGame(BedWarsPlayer player) {
+    public void joinToGame(BWPlayer player) {
         if (status == GameStatus.DISABLED) {
             return;
         }
@@ -1328,21 +1335,22 @@ public class GameImpl implements Game<BedWarsPlayer, TeamImpl, BlockHolder, Worl
             return;
         }
 
+        final var bwPlayerImpl = (BedWarsPlayer) player;
         if (status == GameStatus.REBUILDING) {
             if (isBungeeEnabled()) {
-                BungeeUtils.movePlayerToBungeeServer(player, false);
-                BungeeUtils.sendPlayerBungeeMessage(player, AdventureHelper.toLegacy(Message
+                BungeeUtils.movePlayerToBungeeServer(bwPlayerImpl, false);
+                BungeeUtils.sendPlayerBungeeMessage(bwPlayerImpl, AdventureHelper.toLegacy(Message
                                 .of(LangKeys.IN_GAME_ERRORS_GAME_IS_REBUILDING)
                                 .prefixOrDefault(getCustomPrefixComponent())
                                 .placeholder("arena", this.name)
-                                .asComponent(player)
+                                .asComponent(bwPlayerImpl)
                         ));
             } else {
                 Message
                         .of(LangKeys.IN_GAME_ERRORS_GAME_IS_REBUILDING)
                         .placeholder("arena", this.name)
                         .prefixOrDefault(getCustomPrefixComponent())
-                        .send(player);
+                        .send(bwPlayerImpl);
             }
             return;
         }
@@ -1350,20 +1358,20 @@ public class GameImpl implements Game<BedWarsPlayer, TeamImpl, BlockHolder, Worl
         if ((status == GameStatus.RUNNING || status == GameStatus.GAME_END_CELEBRATING)
                 && !configurationContainer.getOrDefault(ConfigurationContainer.SPECTATOR_JOIN, Boolean.class, false)) {
             if (isBungeeEnabled()) {
-                BungeeUtils.movePlayerToBungeeServer(player, false);
-                BungeeUtils.sendPlayerBungeeMessage(player, AdventureHelper.toLegacy(
+                BungeeUtils.movePlayerToBungeeServer(bwPlayerImpl, false);
+                BungeeUtils.sendPlayerBungeeMessage(bwPlayerImpl, AdventureHelper.toLegacy(
                         Message
                                 .of(LangKeys.IN_GAME_ERRORS_GAME_ALREADY_RUNNING)
                                 .placeholder("arena", this.name)
                                 .prefixOrDefault(getCustomPrefixComponent())
-                                .asComponent(player)
+                                .asComponent(bwPlayerImpl)
                 ));
             } else {
                 Message
                         .of(LangKeys.IN_GAME_ERRORS_GAME_ALREADY_RUNNING)
                         .placeholder("arena", this.name)
                         .prefixOrDefault(getCustomPrefixComponent())
-                        .send(player);
+                        .send(bwPlayerImpl);
             }
             return;
         }
@@ -1376,7 +1384,7 @@ public class GameImpl implements Game<BedWarsPlayer, TeamImpl, BlockHolder, Worl
                     Message
                             .of(LangKeys.IN_GAME_ERRORS_VIP_GAME_IS_FULL)
                             .prefixOrDefault(getCustomPrefixComponent())
-                            .send(player);
+                            .send(bwPlayerImpl);
                     return;
                 }
 
@@ -1405,20 +1413,20 @@ public class GameImpl implements Game<BedWarsPlayer, TeamImpl, BlockHolder, Worl
                 kickPlayer.changeGame(null);
             } else {
                 if (isBungeeEnabled()) {
-                    BungeeUtils.movePlayerToBungeeServer(player, false);
-                    Tasker.build(() -> BungeeUtils.sendPlayerBungeeMessage(player, AdventureHelper.toLegacy(
+                    BungeeUtils.movePlayerToBungeeServer(bwPlayerImpl, false);
+                    Tasker.build(() -> BungeeUtils.sendPlayerBungeeMessage(bwPlayerImpl, AdventureHelper.toLegacy(
                             Message
                                     .of(LangKeys.IN_GAME_ERRORS_GAME_IS_FULL)
                                     .placeholder("arena", GameImpl.this.name)
                                     .prefixOrDefault(getCustomPrefixComponent())
-                                    .asComponent(player)
+                                    .asComponent(bwPlayerImpl)
                     ))).delay(5, TaskerTime.TICKS).start();
                 } else {
                     Message
                             .of(LangKeys.IN_GAME_ERRORS_GAME_IS_FULL)
                             .placeholder("arena", this.name)
                             .prefixOrDefault(getCustomPrefixComponent())
-                            .send(player);
+                            .send(bwPlayerImpl);
                 }
                 return;
             }
@@ -1427,32 +1435,33 @@ public class GameImpl implements Game<BedWarsPlayer, TeamImpl, BlockHolder, Worl
         final var economy = EconomyProvider.getEconomy();
         if (MainConfig.getInstance().node("economy", "enabled").getBoolean(true) && economy != null) {
             if (fee > 0) {
-                if (!economy.withdraw(player, fee)) {
+                if (!economy.withdraw(bwPlayerImpl, fee)) {
                     Message.of(LangKeys.IN_GAME_ECONOMY_MISSING_COINS)
                             .placeholder("coins", fee)
                             .placeholder("currency", economy.currencyName())
-                            .send(player);
+                            .send(bwPlayerImpl);
                     return;
                 }
             }
         }
 
-        player.changeGame(this);
+        bwPlayerImpl.changeGame(this);
     }
 
     @Override
-    public void leaveFromGame(BedWarsPlayer player) {
+    public void leaveFromGame(BWPlayer player) {
         if (status == GameStatus.DISABLED) {
             return;
         }
-        if (player.isInGame() && player.getGame() == this) {
+        final var bwPlayerImpl = (BedWarsPlayer) player;
+        if (bwPlayerImpl.isInGame() && player.getGame() == this) {
             final var economy = EconomyProvider.getEconomy();
             if (MainConfig.getInstance().node("economy", "enabled").getBoolean(true) && economy != null) {
                 if (fee > 0 && MainConfig.getInstance().node("economy", "return-fee").getBoolean(true)) {
-                    economy.deposit(player, fee);
+                    economy.deposit(bwPlayerImpl, fee);
                 }
             }
-            player.changeGame(null);
+            bwPlayerImpl.changeGame(null);
         }
     }
 
@@ -2194,12 +2203,13 @@ public class GameImpl implements Game<BedWarsPlayer, TeamImpl, BlockHolder, Worl
         fakeEnderChests.clear();
 
         // Remove remaining entities registered by other plugins
-        for (var entity : EntitiesManagerImpl.getInstance().getEntities(this)) {
-            var chunk = entity.getEntity().getLocation().getChunk();
+        for (var gameEntity : EntitiesManagerImpl.getInstance().getEntities(this)) {
+            final var entity = gameEntity.getEntity().as(EntityBasic.class);
+            var chunk = entity.getLocation().getChunk();
             if (!chunk.isLoaded()) {
                 chunk.load();
             }
-            entity.getEntity().remove();
+            entity.remove();
             EntitiesManagerImpl.getInstance().removeEntityFromGame(entity);
         }
 
@@ -2361,11 +2371,11 @@ public class GameImpl implements Game<BedWarsPlayer, TeamImpl, BlockHolder, Worl
     }
 
     @Override
-    public void selectPlayerTeam(BedWarsPlayer player, TeamImpl team) {
+    public void selectPlayerTeam(BWPlayer player, Team team) {
         if (!PlayerManagerImpl.getInstance().isPlayerInGame(player.getUuid())) {
             return;
         }
-        BedWarsPlayer profile = PlayerManagerImpl.getInstance().getPlayer(player.getUuid()).orElseThrow();
+        BedWarsPlayer profile = (BedWarsPlayer) PlayerManagerImpl.getInstance().getPlayer(player.getUuid()).orElseThrow();
         if (profile.getGame() != this) {
             return;
         }
@@ -2394,26 +2404,27 @@ public class GameImpl implements Game<BedWarsPlayer, TeamImpl, BlockHolder, Worl
     }
 
     @Override
-    public List<TeamImpl> getAvailableTeams() {
+    public List<Team> getAvailableTeams() {
         return List.copyOf(teams);
     }
 
     @Override
-    public List<TeamImpl> getActiveTeams() {
+    public List<Team> getActiveTeams() {
         return List.copyOf(teamsInGame);
     }
 
     @Override
-    public TeamImpl getTeamOfPlayer(BedWarsPlayer player) {
-        if (!player.isInGame()) {
+    public TeamImpl getTeamOfPlayer(BWPlayer player) {
+        final var playerImpl = (BedWarsPlayer) player;
+        if (!playerImpl.isInGame()) {
             return null;
         }
-        return getPlayerTeam(player);
+        return getPlayerTeam(playerImpl);
     }
 
     @Override
-    public boolean isLocationInArena(LocationHolder location) {
-        return ArenaUtils.isInArea(location, pos1, pos2);
+    public boolean isLocationInArena(Object location) {
+        return ArenaUtils.isInArea(LocationMapper.wrapLocation(location), pos1, pos2);
     }
 
     @Override
@@ -2428,13 +2439,12 @@ public class GameImpl implements Game<BedWarsPlayer, TeamImpl, BlockHolder, Worl
     }
 
     @Override
-    public TeamImpl getTeamOfChest(LocationHolder location) {
-        for (var team : teamsInGame) {
-            if (team.isTeamChestRegistered(location)) {
-                return team;
-            }
-        }
-        return null;
+    public TeamImpl getTeamOfChest(Object location) {
+        final var wrappedLocation = LocationMapper.wrapLocation(location);
+        return teamsInGame.stream()
+                .filter(team -> team.isTeamChestRegistered(wrappedLocation))
+                .findFirst()
+                .orElse(null);
     }
 
     public void addChestForFutureClear(LocationHolder loc, Container inventory) {
@@ -2471,17 +2481,17 @@ public class GameImpl implements Game<BedWarsPlayer, TeamImpl, BlockHolder, Worl
     }
 
     @Override
-    public boolean isPlayerInAnyTeam(BedWarsPlayer player) {
+    public boolean isPlayerInAnyTeam(BWPlayer player) {
         return getTeamOfPlayer(player) != null;
     }
 
     @Override
-    public boolean isTeamActive(TeamImpl team) {
-        return teamsInGame.contains(team);
+    public boolean isTeamActive(Team team) {
+        return teamsInGame.contains((TeamImpl) team);
     }
 
     @Override
-    public boolean isPlayerInTeam(BedWarsPlayer player, TeamImpl team) {
+    public boolean isPlayerInTeam(BWPlayer player, Team team) {
         return getTeamOfPlayer(player) == team;
     }
 
@@ -2495,18 +2505,18 @@ public class GameImpl implements Game<BedWarsPlayer, TeamImpl, BlockHolder, Worl
     }
 
     @Override
-    public int countTeamChests(TeamImpl team) {
+    public int countTeamChests(Team team) {
         return team.countTeamChests();
     }
 
     @Override
-    public List<SpecialItem<?,?,?>> getActiveSpecialItems() {
+    public List<SpecialItem> getActiveSpecialItems() {
         return List.copyOf(activeSpecialItems);
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public <I extends SpecialItem<?,?,?>> List<I> getActiveSpecialItems(Class<I> type) {
+    public <I extends SpecialItem> List<I> getActiveSpecialItems(Class<I> type) {
         return activeSpecialItems.stream()
                 .filter(type::isInstance)
                 .map(specialItem -> (I) specialItem)
@@ -2514,7 +2524,7 @@ public class GameImpl implements Game<BedWarsPlayer, TeamImpl, BlockHolder, Worl
     }
 
     @Override
-    public List<SpecialItem<?,?,?>> getActiveSpecialItemsOfTeam(TeamImpl team) {
+    public List<SpecialItem> getActiveSpecialItemsOfTeam(Team team) {
         return activeSpecialItems.stream()
                 .filter(item -> item.getTeam().equals(team))
                 .collect(Collectors.toList());
@@ -2522,7 +2532,7 @@ public class GameImpl implements Game<BedWarsPlayer, TeamImpl, BlockHolder, Worl
 
     @SuppressWarnings("unchecked")
     @Override
-    public <I extends SpecialItem<?,?,?>> List<I> getActiveSpecialItemsOfTeam(TeamImpl team, Class<I> type) {
+    public <I extends SpecialItem> List<I> getActiveSpecialItemsOfTeam(Team team, Class<I> type) {
         return activeSpecialItems.stream()
                 .filter(item -> type.isInstance(item) && item.getTeam().equals(team))
                 .map(item -> (I) item)
@@ -2530,7 +2540,7 @@ public class GameImpl implements Game<BedWarsPlayer, TeamImpl, BlockHolder, Worl
     }
 
     @Override
-    public SpecialItem<?,?,?> getFirstActiveSpecialItemOfTeam(TeamImpl team) {
+    public SpecialItem getFirstActiveSpecialItemOfTeam(Team team) {
         return activeSpecialItems.stream()
                 .filter(item -> item.getTeam().equals(team))
                 .findFirst()
@@ -2539,7 +2549,7 @@ public class GameImpl implements Game<BedWarsPlayer, TeamImpl, BlockHolder, Worl
 
     @SuppressWarnings("unchecked")
     @Override
-    public <I extends SpecialItem<?,?,?>> I getFirstActiveSpecialItemOfTeam(TeamImpl team, Class<I> type) {
+    public <I extends SpecialItem> I getFirstActiveSpecialItemOfTeam(Team team, Class<I> type) {
         return (I) activeSpecialItems.stream()
                 .filter(item -> item.getTeam().equals(team) && type.isInstance(item))
                 .findFirst()
@@ -2547,7 +2557,7 @@ public class GameImpl implements Game<BedWarsPlayer, TeamImpl, BlockHolder, Worl
     }
 
     @Override
-    public List<SpecialItem<?,?,?>> getActiveSpecialItemsOfPlayer(BedWarsPlayer player) {
+    public List<SpecialItem> getActiveSpecialItemsOfPlayer(BWPlayer player) {
         return activeSpecialItems.stream()
                 .filter(item -> item.getPlayer().equals(player))
                 .collect(Collectors.toList());
@@ -2555,7 +2565,7 @@ public class GameImpl implements Game<BedWarsPlayer, TeamImpl, BlockHolder, Worl
 
     @SuppressWarnings("unchecked")
     @Override
-    public <I extends SpecialItem<?,?,?>> List<I> getActiveSpecialItemsOfPlayer(BedWarsPlayer player, Class<I> type) {
+    public <I extends SpecialItem> List<I> getActiveSpecialItemsOfPlayer(BWPlayer player, Class<I> type) {
         return activeSpecialItems.stream()
                 .filter(item -> item.getPlayer().equals(player) && type.isInstance(item))
                 .map(item -> (I) item)
@@ -2563,7 +2573,7 @@ public class GameImpl implements Game<BedWarsPlayer, TeamImpl, BlockHolder, Worl
     }
 
     @Override
-    public SpecialItem<?,?,?> getFirstActiveSpecialItemOfPlayer(BedWarsPlayer player) {
+    public SpecialItem getFirstActiveSpecialItemOfPlayer(BWPlayer player) {
         return activeSpecialItems.stream()
                 .filter(item -> item.getPlayer().equals(player))
                 .findFirst()
@@ -2572,7 +2582,7 @@ public class GameImpl implements Game<BedWarsPlayer, TeamImpl, BlockHolder, Worl
 
     @SuppressWarnings("unchecked")
     @Override
-    public <I extends SpecialItem<?,?,?>> I getFirstActiveSpecialItemOfPlayer(BedWarsPlayer player, Class<I> type) {
+    public <I extends SpecialItem> I getFirstActiveSpecialItemOfPlayer(BWPlayer player, Class<I> type) {
         return (I) activeSpecialItems.stream()
                 .filter(item -> item.getPlayer().equals(player) && type.isInstance(item))
                 .findFirst()
@@ -2580,19 +2590,19 @@ public class GameImpl implements Game<BedWarsPlayer, TeamImpl, BlockHolder, Worl
     }
 
     @Override
-    public void registerSpecialItem(SpecialItem<?,?,?> item) {
+    public void registerSpecialItem(SpecialItem item) {
         if (!activeSpecialItems.contains(item)) {
             activeSpecialItems.add(item);
         }
     }
 
     @Override
-    public void unregisterSpecialItem(SpecialItem<?,?,?> item) {
+    public void unregisterSpecialItem(SpecialItem item) {
         activeSpecialItems.remove(item);
     }
 
     @Override
-    public boolean isRegisteredSpecialItem(SpecialItem<?,?,?> item) {
+    public boolean isRegisteredSpecialItem(SpecialItem item) {
         return activeSpecialItems.contains(item);
     }
 
@@ -2602,14 +2612,14 @@ public class GameImpl implements Game<BedWarsPlayer, TeamImpl, BlockHolder, Worl
     }
 
     @Override
-    public List<DelayFactory> getActiveDelaysOfPlayer(BedWarsPlayer player) {
+    public List<DelayFactory> getActiveDelaysOfPlayer(BWPlayer player) {
         return activeDelays.stream()
                 .filter(delayFactory -> delayFactory.getPlayer().equals(player))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public DelayFactory getActiveDelay(BedWarsPlayer player, Class<? extends SpecialItem<?,?,?>> specialItem) {
+    public DelayFactory getActiveDelay(BWPlayer player, Class<? extends SpecialItem> specialItem) {
         return activeDelays.stream()
                 .filter(delayFactory -> delayFactory.getPlayer().equals(player) && specialItem.isInstance(delayFactory.getSpecialItem()))
                 .findFirst()
@@ -2629,7 +2639,7 @@ public class GameImpl implements Game<BedWarsPlayer, TeamImpl, BlockHolder, Worl
     }
 
     @Override
-    public boolean isDelayActive(BedWarsPlayer player, Class<? extends SpecialItem<?,?,?>> specialItem) {
+    public boolean isDelayActive(BWPlayer player, Class<? extends SpecialItem> specialItem) {
         return activeDelays.stream()
                 .filter(delayFactory -> delayFactory.getPlayer().equals(player) && specialItem.isInstance(delayFactory.getSpecialItem()))
                 .findFirst()
@@ -2674,7 +2684,7 @@ public class GameImpl implements Game<BedWarsPlayer, TeamImpl, BlockHolder, Worl
     }
 
     @Override
-    public List<ItemSpawnerImpl> getItemSpawners() {
+    public List<ItemSpawner> getItemSpawners() {
         return List.copyOf(spawners);
     }
 
@@ -2696,12 +2706,12 @@ public class GameImpl implements Game<BedWarsPlayer, TeamImpl, BlockHolder, Worl
     }
 
     @Override
-    public void selectPlayerRandomTeam(BedWarsPlayer player) {
-        joinRandomTeam(player);
+    public void selectPlayerRandomTeam(BWPlayer player) {
+        joinRandomTeam((BedWarsPlayer) player);
     }
 
     @Override
-    public StatusBar<?> getStatusBar() {
+    public StatusBar getStatusBar() {
         return statusbar;
     }
 
@@ -2717,13 +2727,10 @@ public class GameImpl implements Game<BedWarsPlayer, TeamImpl, BlockHolder, Worl
     }
 
     @Override
-    public boolean isEntityShop(EntityBasic entity) {
-        for (var store : gameStore) {
-            if (entity.equals(store.getEntity())) {
-                return true;
-            }
-        }
-        return false;
+    public boolean isEntityShop(Object entity) {
+        return EntityMapper.wrapEntity(entity)
+                .stream()
+                .anyMatch(wrappedEntity -> gameStore.stream().anyMatch(store -> store.getEntity().equals(wrappedEntity)));
     }
 
     public RespawnProtection addProtectedPlayer(BedWarsPlayer player) {
@@ -2750,8 +2757,8 @@ public class GameImpl implements Game<BedWarsPlayer, TeamImpl, BlockHolder, Worl
     }
 
     @Override
-    public boolean isProtectionActive(BedWarsPlayer player) {
-        return (respawnProtectionMap.containsKey(player));
+    public boolean isProtectionActive(BWPlayer player) {
+        return (respawnProtectionMap.containsKey((BedWarsPlayer) player));
     }
 
     public List<BedWarsPlayer> getPlayersWithoutVIP() {

@@ -6,6 +6,7 @@ import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import org.screamingsandals.bedwars.api.Team;
 import org.screamingsandals.bedwars.api.config.ConfigurationContainer;
+import org.screamingsandals.bedwars.api.player.BWPlayer;
 import org.screamingsandals.bedwars.config.MainConfig;
 import org.screamingsandals.bedwars.lang.LangKeys;
 import org.screamingsandals.bedwars.player.BedWarsPlayer;
@@ -29,7 +30,7 @@ import java.util.stream.Collectors;
 
 @Getter
 @Setter
-public class TeamImpl implements Team<LocationHolder, TeamColorImpl, GameImpl, Container, BedWarsPlayer> {
+public class TeamImpl implements Team {
     private TeamColorImpl color;
     private String name;
     private LocationHolder targetBlock;
@@ -200,8 +201,8 @@ public class TeamImpl implements Team<LocationHolder, TeamColorImpl, GameImpl, C
     }
 
     @Override
-    public boolean isPlayerInTeam(BedWarsPlayer player) {
-        return players.contains(player);
+    public boolean isPlayerInTeam(BWPlayer player) {
+        return players.contains((BedWarsPlayer) player);
     }
 
     @Override

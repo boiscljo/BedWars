@@ -10,12 +10,12 @@ import org.screamingsandals.lib.utils.Wrapper;
  * @author Bedwars Team
  */
 @ApiStatus.NonExtendable
-public interface Golem<G extends Game, P extends BWPlayer, T extends Team, E extends Wrapper> extends SpecialItem<G, P, T> {
+public interface Golem extends SpecialItem {
 
     /**
      * @return
      */
-    E getEntity();
+    Wrapper getEntity();
 
     /**
      * @return

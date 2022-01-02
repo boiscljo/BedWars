@@ -18,4 +18,6 @@ public interface BWPlayer extends Wrapper {
 
     @Nullable
     Game getGame();
+
+    boolean canJoinFullGame();
 }
