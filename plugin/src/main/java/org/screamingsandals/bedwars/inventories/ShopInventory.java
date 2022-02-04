@@ -306,10 +306,11 @@ public class ShopInventory {
                     if (arguments.length > 2) {
                         String upgradeBy = arguments[0];
                         String upgrade = arguments[1];
-                        UpgradeStorage upgradeStorage = UpgradeRegistry.getUpgrade("spawner");
-                        if (upgradeStorage == null) {
+                        Optional<UpgradeStorage> upgradeStorageO = UpgradeRegistry.getUpgrade("spawner");
+                        if (upgradeStorageO.isEmpty()) {
                             return null;
                         }
+                        UpgradeStorage upgradeStorage = upgradeStorageO.orElseThrow();
                         List<Upgrade> upgrades = null;
                         switch (upgradeBy) {
                             case "name":
@@ -555,9 +556,9 @@ public class ShopInventory {
                     return;
                 }
 
-                var upgradeStorage = UpgradeRegistry.getUpgrade(configuredType);
-                if (upgradeStorage != null) {
-
+                var upgradeStorageO = UpgradeRegistry.getUpgrade(configuredType);
+                if (upgradeStorageO.isPresent()) {
+                    final var upgradeStorage = upgradeStorageO.orElseThrow();
                     // TODO: Learn SimpleGuiFormat upgrades pre-parsing and automatic renaming old
                     // variables
                     var team = game.getTeamOfPlayer(player);

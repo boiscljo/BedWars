@@ -28,7 +28,6 @@ import org.screamingsandals.bedwars.api.config.ConfigurationContainer;
  * @since 0.3.0
  */
 public interface Variant {
-
     /**
      *
      * @return name of this variant
@@ -43,5 +42,4 @@ public interface Variant {
      * @since 0.3.0
      */
     ConfigurationContainer getConfigurationContainer();
-
 }

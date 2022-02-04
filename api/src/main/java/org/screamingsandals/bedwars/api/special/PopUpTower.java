@@ -27,7 +27,6 @@ import org.screamingsandals.lib.utils.Wrapper;
 
 @ApiStatus.NonExtendable
 public interface PopUpTower extends SpecialItem {
-
     /**
      * <p>Gets the bridge material.</p>
      *

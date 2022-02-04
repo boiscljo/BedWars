@@ -28,7 +28,6 @@ import org.screamingsandals.bedwars.api.special.SpecialItem;
  */
 @ApiStatus.NonExtendable
 public interface DelayFactory {
-
     /**
      * @return is delay active
      */

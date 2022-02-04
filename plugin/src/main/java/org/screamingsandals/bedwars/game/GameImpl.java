@@ -973,8 +973,8 @@ public class GameImpl implements Game {
             PlayerStatisticManager.getInstance().getStatistic(gamePlayer);
         }
 
-        if (arenaTime.time >= 0) {
-            gamePlayer.setPlayerTime(arenaTime.time, false);
+        if (arenaTime.getTime() >= 0) {
+            gamePlayer.setPlayerTime(arenaTime.getTime(), false);
         }
 
         if (arenaWeather != null) {
@@ -1886,9 +1886,9 @@ public class GameImpl implements Game {
                     for (ItemSpawnerImpl spawner : spawners) {
                         spawner.start(this);
 
-                        UpgradeStorage storage = UpgradeRegistry.getUpgrade("spawner");
-                        if (storage != null) {
-                            storage.addUpgrade(this, spawner);
+                        Optional<UpgradeStorage> storage = UpgradeRegistry.getUpgrade("spawner");
+                        if (storage.isPresent()) {
+                            storage.orElseThrow().addUpgrade(this, spawner);
                         }
                     }
 
@@ -2165,7 +2165,7 @@ public class GameImpl implements Game {
             experimentalBoard = null;
         }
         otherVisuals.forEach(visual -> {
-            if (visual.isShown()) {
+            if (visual.shown()) {
                 visual.destroy();
             }
         });

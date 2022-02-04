@@ -27,7 +27,6 @@ import java.util.UUID;
 
 @ApiStatus.NonExtendable
 public interface PlayerStatisticsManager {
-
     List<LeaderboardEntry> getLeaderboard(int count);
 
     PlayerStatistic loadStatistic(UUID uuid);

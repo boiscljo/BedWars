@@ -26,7 +26,6 @@ import org.screamingsandals.bedwars.api.game.Game;
  *
  */
 public interface Upgrade {
-	
 	/**
 	 * 
 	 * @return registered name of this upgrade

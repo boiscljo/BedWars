@@ -19,9 +19,15 @@
 
 package org.screamingsandals.bedwars.api;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
 /**
  * @author Bedwars Team
  */
+@Getter
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public enum ArenaTime {
     WORLD(-1),
     DAY_BEGINNING(0),
@@ -32,16 +38,5 @@ public enum ArenaTime {
     MIDNIGHT(18000),
     SUNRISE(23000);
 
-    public final int time;
-
-    ArenaTime(int time) {
-        this.time = time;
-    }
-
-    /**
-     * @return time in ticks
-     */
-    public int getTime() {
-        return this.time;
-    }
+    private final int time;
 }

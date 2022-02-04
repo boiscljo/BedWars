@@ -30,7 +30,6 @@ import org.screamingsandals.lib.utils.Wrapper;
  */
 @ApiStatus.NonExtendable
 public interface Golem extends SpecialItem {
-
     /**
      * @return
      */
@@ -51,5 +50,4 @@ public interface Golem extends SpecialItem {
      * @return
      */
     double getHealth();
-
 }

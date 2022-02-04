@@ -24,12 +24,13 @@ import org.screamingsandals.bedwars.api.game.ItemSpawner;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * @author Bedwars Team
  */
 public final class UpgradeRegistry {
-    private static final Map<String, UpgradeStorage> registeredUpgrades = new HashMap<>();
+    private static final Map<String, UpgradeStorage> REGISTERED_UPGRADES = new HashMap<>();
 
     static {
         registerUpgrade("spawner", ItemSpawner.class);
@@ -45,7 +46,7 @@ public final class UpgradeRegistry {
      */
     public static UpgradeStorage registerUpgrade(String name, Class<? extends Upgrade> upgradeClass) {
         UpgradeStorage storage = new UpgradeStorage(name, upgradeClass);
-        registeredUpgrades.put(name, storage);
+        REGISTERED_UPGRADES.put(name, storage);
         return storage;
     }
 
@@ -55,7 +56,7 @@ public final class UpgradeRegistry {
      * @param name Name of upgrade
      */
     public static void unregisterUpgrade(String name) {
-		registeredUpgrades.remove(name);
+		REGISTERED_UPGRADES.remove(name);
     }
 
     /**
@@ -65,17 +66,17 @@ public final class UpgradeRegistry {
      * @return if upgrade is registered
      */
     public static boolean isUpgradeRegistered(String name) {
-        return registeredUpgrades.containsKey(name);
+        return REGISTERED_UPGRADES.containsKey(name);
     }
 
     /**
      * Get storage for upgrades
      *
      * @param name Name of upgrade
-     * @return storage of specified upgrade type or null
+     * @return storage of specified upgrade type
      */
-    public static UpgradeStorage getUpgrade(String name) {
-        return registeredUpgrades.get(name);
+    public static Optional<UpgradeStorage> getUpgrade(String name) {
+        return Optional.ofNullable(REGISTERED_UPGRADES.get(name));
     }
 
     /**
@@ -84,7 +85,7 @@ public final class UpgradeRegistry {
      * @param game that is ending
      */
     public static void clearAll(Game game) {
-        for (UpgradeStorage storage : registeredUpgrades.values()) {
+        for (UpgradeStorage storage : REGISTERED_UPGRADES.values()) {
             storage.resetUpgradesForGame(game);
         }
     }

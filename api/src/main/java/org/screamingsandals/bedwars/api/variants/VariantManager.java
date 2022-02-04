@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Manages all BedWars variants
+ * Manages all BedWars variants.
  *
  * @author Screaming Sandals
  * @since 0.3.0

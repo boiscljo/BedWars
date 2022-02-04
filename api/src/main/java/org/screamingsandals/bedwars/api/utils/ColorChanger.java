@@ -24,20 +24,18 @@ import org.screamingsandals.bedwars.api.TeamColor;
 import org.screamingsandals.lib.utils.Wrapper;
 
 /**
- * Utility class used for coloring items
+ * Utility class used for coloring items.
  *
  * @author ScreamingSandals
- * @param <I> Item
  */
 @ApiStatus.NonExtendable
 public interface ColorChanger {
-
     /**
-     * Apply color of team to ItemStack
+     * Applies the supplied {@link TeamColor} to the item stack.
      *
-     * @param color Color of team
-     * @param stack ItemStack that should be colored
-     * @return colored ItemStack or normal ItemStack if ItemStack can't be colored
+     * @param color the team color
+     * @param stack the item stack
+     * @return colored or normal item stack if it can't be colored
      */
     Wrapper applyColor(TeamColor color, Object stack);
 }

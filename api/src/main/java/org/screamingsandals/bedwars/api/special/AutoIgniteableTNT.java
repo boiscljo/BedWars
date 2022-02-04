@@ -44,5 +44,4 @@ public interface AutoIgniteableTNT extends SpecialItem {
      * spawn an entity tnt
      */
     void spawn(Object location);
-    
 }
