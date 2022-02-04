@@ -1,3 +1,22 @@
+/*
+ * Copyright (C) 2022 ScreamingSandals
+ *
+ * This file is part of Screaming BedWars.
+ *
+ * Screaming BedWars is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Screaming BedWars is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Screaming BedWars. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package org.screamingsandals.bedwars.game;
 
 import com.onarandombox.MultiverseCore.api.Core;
@@ -728,7 +747,7 @@ public class GameImpl implements Game {
                     }
 
                     if (breakEvent.isDrops()) {
-                        event.setDropItems(false);
+                        event.dropItems(false);
                         player.getPlayerInventory().addItem(ItemFactory.build("ENDER_CHEST").orElse(ItemFactory.getAir()));
                     }
                 }
@@ -736,7 +755,7 @@ public class GameImpl implements Game {
 
             if (!breakEvent.isDrops()) {
                 try {
-                    event.setDropItems(false);
+                    event.dropItems(false);
                 } catch (Throwable tr) {
                     block.setType(BlockTypeHolder.air());
                 }
@@ -764,7 +783,7 @@ public class GameImpl implements Game {
                     region.putOriginalBlock(loc, region.getBedNeighbor(block).getBlockState().orElseThrow());
                 }
                 try {
-                    event.setDropItems(false);
+                    event.dropItems(false);
                 } catch (Throwable tr) {
                     if (region.isBedHead(block.getBlockState().orElseThrow())) {
                         region.getBedNeighbor(block).setType(BlockTypeHolder.air());
@@ -782,7 +801,7 @@ public class GameImpl implements Game {
                 bedDestroyed(loc, player, false, block.getType().isSameType("respawn_anchor"), block.getType().isSameType("cake"));
                 region.putOriginalBlock(loc, block.getBlockState().orElseThrow());
                 try {
-                    event.setDropItems(false);
+                    event.dropItems(false);
                 } catch (Throwable tr) {
                     block.setType(BlockTypeHolder.air());
                 }

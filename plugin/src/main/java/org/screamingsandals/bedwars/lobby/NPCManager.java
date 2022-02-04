@@ -1,3 +1,22 @@
+/*
+ * Copyright (C) 2022 ScreamingSandals
+ *
+ * This file is part of Screaming BedWars.
+ *
+ * Screaming BedWars is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Screaming BedWars is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Screaming BedWars. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package org.screamingsandals.bedwars.lobby;
 
 import lombok.Getter;
@@ -98,8 +117,9 @@ public class NPCManager {
             var npc = bedWarsNPC.getNpc();
             if (npc != null) {
                 Tasker.build(() -> {
-                            if (event.getPlayer().isOnline()) {
-                                npc.addViewer(event.getPlayer());
+                            final var player = event.player();
+                            if (player.isOnline()) {
+                                npc.addViewer(player);
                             }
                         })
                         .delay(10, TaskerTime.TICKS)
@@ -113,7 +133,7 @@ public class NPCManager {
         npcs.forEach(bedWarsNPC -> {
             var npc = bedWarsNPC.getNpc();
             if (npc != null) {
-                npc.removeViewer(event.getPlayer());
+                npc.removeViewer(event.player());
             }
         });
     }
@@ -121,13 +141,13 @@ public class NPCManager {
     @OnEvent
     public void onNPCInteract(NPCInteractEvent event) {
         npcs.stream()
-                .filter(bedWarsNPC1 -> bedWarsNPC1.getNpc().equals(event.getVisual()))
+                .filter(bedWarsNPC1 -> bedWarsNPC1.getNpc().equals(event.visual()))
                 .findFirst()
                 .ifPresent(npc -> {
-                    if (event.getInteractType() == InteractType.RIGHT_CLICK && NPCCommand.SELECTING_NPC.contains(event.getPlayer().getUuid())) {
-                        NPCCommand.SELECTING_NPC.remove(event.getPlayer().getUuid());
-                        NPCCommand.NPCS_IN_HAND.put(event.getPlayer().getUuid(), npc);
-                        event.getPlayer().sendMessage(Message.of(LangKeys.ADMIN_NPC_EDITING)
+                    if (event.interactType() == InteractType.RIGHT_CLICK && NPCCommand.SELECTING_NPC.contains(event.player().getUuid())) {
+                        NPCCommand.SELECTING_NPC.remove(event.player().getUuid());
+                        NPCCommand.NPCS_IN_HAND.put(event.player().getUuid(), npc);
+                        event.player().sendMessage(Message.of(LangKeys.ADMIN_NPC_EDITING)
                                 .defaultPrefix()
                                 .placeholder("x", npc.getLocation().getX(), 2)
                                 .placeholder("y", npc.getLocation().getY(), 2)
@@ -135,7 +155,7 @@ public class NPCManager {
                                 .placeholder("yaw", npc.getLocation().getYaw(), 5)
                                 .placeholder("pitch", npc.getLocation().getPitch(), 5));
                     } else {
-                        npc.handleClick(event.getPlayer(), event.getInteractType());
+                        npc.handleClick(event.player(), event.interactType());
                     }
                 });
     }

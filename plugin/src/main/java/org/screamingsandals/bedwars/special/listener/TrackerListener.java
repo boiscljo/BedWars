@@ -1,3 +1,22 @@
+/*
+ * Copyright (C) 2022 ScreamingSandals
+ *
+ * This file is part of Screaming BedWars.
+ *
+ * Screaming BedWars is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Screaming BedWars is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Screaming BedWars. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package org.screamingsandals.bedwars.special.listener;
 
 import org.screamingsandals.bedwars.utils.ItemUtils;
@@ -25,20 +44,20 @@ public class TrackerListener {
 
     @OnEvent
     public void onTrackerUse(SPlayerInteractEvent event) {
-        var player = event.getPlayer();
+        var player = event.player();
         if (!PlayerManagerImpl.getInstance().isPlayerInGame(player)) {
             return;
         }
 
         var gamePlayer = PlayerManagerImpl.getInstance().getPlayer(player).orElseThrow();
         var game = gamePlayer.getGame();
-        if (event.getAction() == SPlayerInteractEvent.Action.RIGHT_CLICK_AIR || event.getAction() == SPlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) {
+        if (event.action() == SPlayerInteractEvent.Action.RIGHT_CLICK_AIR || event.action() == SPlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) {
             if (game != null && game.getStatus() == GameStatus.RUNNING && !gamePlayer.isSpectator()) {
-                if (event.getItem() != null) {
-                    var stack = event.getItem();
+                if (event.item() != null) {
+                    var stack = event.item();
                     var unhidden = ItemUtils.getIfStartsWith(stack, TRACKER_PREFIX);
                     if (unhidden != null) {
-                        event.setCancelled(true);
+                        event.cancelled(true);
 
                         Tasker.build(() -> {
                             var target = MiscUtils.findTarget(game, player, Double.MAX_VALUE);

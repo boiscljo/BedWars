@@ -1,3 +1,22 @@
+/*
+ * Copyright (C) 2022 ScreamingSandals
+ *
+ * This file is part of Screaming BedWars.
+ *
+ * Screaming BedWars is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Screaming BedWars is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Screaming BedWars. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package org.screamingsandals.bedwars.special.listener;
 
 import org.screamingsandals.bedwars.utils.ItemUtils;
@@ -46,20 +65,20 @@ public class PermaItemListener {
 
     @OnEvent
     public void onItemRemoval(SPlayerInventoryClickEvent event) {
-        var player = event.getPlayer();
+        var player = event.player();
         if (!PlayerManagerImpl.getInstance().isPlayerInGame(player)) {
             return;
         }
 
-        if (event.getInventory() != null) {
-            if (!(event.getInventory() instanceof PlayerContainer)) {
+        if (event.inventory() != null) {
+            if (!(event.inventory() instanceof PlayerContainer)) {
                 return;
             }
         }
 
-        var cursorItem = event.getCursorItem();
-        var slotItem = event.getCurrentItem();
-        var action = event.getAction();
+        var cursorItem = event.cursorItem();
+        var slotItem = event.currentItem();
+        var action = event.action();
 
         String cursorItemUnhashedProp = null;
         String slotItemUnhashedProp = null;
@@ -73,18 +92,18 @@ public class PermaItemListener {
         }
 
         if ((cursorItemUnhashedProp != null || slotItemUnhashedProp != null) && blockedInventoryActions.contains(action)) {
-            event.setCancelled(true);
+            event.cancelled(true);
         }
     }
 
     @OnEvent
     public void onItemDrop(SPlayerDropItemEvent event) {
-        if (!PlayerManagerImpl.getInstance().isPlayerInGame(event.getPlayer())) {
+        if (!PlayerManagerImpl.getInstance().isPlayerInGame(event.player())) {
             return;
         }
 
-        if (ItemUtils.getIfStartsWith(event.getItemDrop().getItem(), PERMA_ITEM_PREFIX) != null) {
-            event.setCancelled(true);
+        if (ItemUtils.getIfStartsWith(event.itemDrop().getItem(), PERMA_ITEM_PREFIX) != null) {
+            event.cancelled(true);
         }
     }
 

@@ -1,3 +1,22 @@
+/*
+ * Copyright (C) 2022 ScreamingSandals
+ *
+ * This file is part of Screaming BedWars.
+ *
+ * Screaming BedWars is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Screaming BedWars is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Screaming BedWars. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package org.screamingsandals.bedwars.special.listener;
 
 import org.screamingsandals.bedwars.utils.ItemUtils;
@@ -25,11 +44,11 @@ public class MagnetShoesListener {
 
     @OnEvent
     public void onDamage(SEntityDamageEvent event) {
-        if (event.isCancelled() || !(event.getEntity() instanceof PlayerWrapper)) {
+        if (event.cancelled() || !(event.entity() instanceof PlayerWrapper)) {
             return;
         }
 
-        var player = (PlayerWrapper) event.getEntity();
+        var player = (PlayerWrapper) event.entity();
         if (PlayerManagerImpl.getInstance().isPlayerInGame(player)) {
             var boots = player.getPlayerInventory().getBoots();
             if (boots != null) {
@@ -38,8 +57,8 @@ public class MagnetShoesListener {
                     int probability = Integer.parseInt(magnetShoes.split(":")[2]);
                     int randInt = MiscUtils.randInt(0, 100);
                     if (randInt <= probability) {
-                        event.setCancelled(true);
-                        player.damage(event.getDamage());
+                        event.cancelled(true);
+                        player.damage(event.damage());
                     }
                 }
             }

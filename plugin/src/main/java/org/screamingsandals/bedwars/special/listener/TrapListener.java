@@ -1,3 +1,22 @@
+/*
+ * Copyright (C) 2022 ScreamingSandals
+ *
+ * This file is part of Screaming BedWars.
+ *
+ * Screaming BedWars is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Screaming BedWars is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Screaming BedWars. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package org.screamingsandals.bedwars.special.listener;
 
 import org.screamingsandals.bedwars.utils.ItemUtils;
@@ -67,13 +86,13 @@ public class TrapListener {
 
     @OnEvent
     public void onMove(SPlayerMoveEvent event) {
-        var player = event.getPlayer();
-        if (event.isCancelled() || !PlayerManagerImpl.getInstance().isPlayerInGame(player)) {
+        var player = event.player();
+        if (event.cancelled() || !PlayerManagerImpl.getInstance().isPlayerInGame(player)) {
             return;
         }
 
-        var difX = Math.abs(event.getCurrentLocation().getX() - event.getNewLocation().getX());
-        var difZ = Math.abs(event.getCurrentLocation().getZ() - event.getNewLocation().getZ());
+        var difX = Math.abs(event.currentLocation().getX() - event.newLocation().getX());
+        var difZ = Math.abs(event.currentLocation().getZ() - event.newLocation().getZ());
 
         if (difX == 0.0 && difZ == 0.0) {
             return;
@@ -85,7 +104,7 @@ public class TrapListener {
             for (var special : game.getActiveSpecialItems(TrapImpl.class)) {
                 if (special.isPlaced()) {
                     if (game.getPlayerTeam(gPlayer) != special.getTeam()) {
-                        if (event.getNewLocation().getBlock().equals(special.getLocation().getBlock())) {
+                        if (event.newLocation().getBlock().equals(special.getLocation().getBlock())) {
                             special.process(gPlayer, game.getPlayerTeam(gPlayer), false);
                         }
                     }

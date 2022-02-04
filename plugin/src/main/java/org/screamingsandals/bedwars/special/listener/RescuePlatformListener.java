@@ -1,3 +1,22 @@
+/*
+ * Copyright (C) 2022 ScreamingSandals
+ *
+ * This file is part of Screaming BedWars.
+ *
+ * Screaming BedWars is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Screaming BedWars is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Screaming BedWars. If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package org.screamingsandals.bedwars.special.listener;
 
 import org.screamingsandals.bedwars.api.game.GameStatus;
@@ -30,7 +49,7 @@ public class RescuePlatformListener {
 
     @OnEvent
     public void onPlayerUseItem(SPlayerInteractEvent event) {
-        var player = event.getPlayer();
+        var player = event.player();
         if (!PlayerManagerImpl.getInstance().isPlayerInGame(player)) {
             return;
         }
@@ -38,14 +57,14 @@ public class RescuePlatformListener {
         var gPlayer = PlayerManagerImpl.getInstance().getPlayer(player).orElseThrow();
         var game = gPlayer.getGame();
 
-        if (event.getAction() == SPlayerInteractEvent.Action.RIGHT_CLICK_AIR || event.getAction() == SPlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) {
-            if (game != null && game.getStatus() == GameStatus.RUNNING && !gPlayer.isSpectator() && event.getItem() != null) {
-                var stack = event.getItem();
+        if (event.action() == SPlayerInteractEvent.Action.RIGHT_CLICK_AIR || event.action() == SPlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) {
+            if (game != null && game.getStatus() == GameStatus.RUNNING && !gPlayer.isSpectator() && event.item() != null) {
+                var stack = event.item();
                 var unhidden = ItemUtils.getIfStartsWith(stack, RESCUE_PLATFORM_PREFIX);
 
                 if (unhidden != null) {
                     if (!game.isDelayActive(gPlayer, RescuePlatformImpl.class)) {
-                        event.setCancelled(true);
+                        event.cancelled(true);
 
                         var propertiesSplit = unhidden.split(":");
                         var isBreakable = Boolean.parseBoolean(propertiesSplit[2]);
@@ -68,7 +87,7 @@ public class RescuePlatformListener {
 
                         rescuePlatform.createPlatform(isBreakable, breakTime, distance, result);
                     } else {
-                        event.setCancelled(true);
+                        event.cancelled(true);
 
                         var delay = game.getActiveDelay(gPlayer, RescuePlatformImpl.class).getRemainDelay();
                         MiscUtils.sendActionBarMessage(player, Message.of(LangKeys.SPECIALS_ITEM_DELAY).placeholder("time", delay));
@@ -80,8 +99,8 @@ public class RescuePlatformListener {
 
     @OnEvent
     public void onFallDamage(SEntityDamageEvent event) {
-        var entity = event.getEntity();
-        if (event.isCancelled() || !(entity instanceof PlayerWrapper)) {
+        var entity = event.entity();
+        if (event.cancelled() || !(entity instanceof PlayerWrapper)) {
             return;
         }
 
@@ -97,11 +116,11 @@ public class RescuePlatformListener {
         }
 
         var rescuePlatform = game.getFirstActiveSpecialItemOfPlayer(gPlayer, RescuePlatformImpl.class);
-        if (rescuePlatform != null && event.getDamageCause().is("FALL")) {
+        if (rescuePlatform != null && event.damageCause().is("FALL")) {
             var block = player.getLocation().add(BlockFace.DOWN).getBlock();
             if (block != null) {
                 if (block.getType().isSameType(rescuePlatform.getMaterial())) {
-                    event.setCancelled(true);
+                    event.cancelled(true);
                 }
             }
         }
@@ -109,7 +128,7 @@ public class RescuePlatformListener {
 
     @OnEvent
     public void onBlockBreak(SPlayerBlockBreakEvent event) {
-        var player = event.getPlayer();
+        var player = event.player();
         if (!PlayerManagerImpl.getInstance().isPlayerInGame(player)) {
             return;
         }
@@ -120,12 +139,12 @@ public class RescuePlatformListener {
             return;
         }
 
-        var block = event.getBlock();
+        var block = event.block();
         for (var checkedPlatform : game.getActiveSpecialItemsOfPlayer(gPlayer, RescuePlatformImpl.class)) {
             if (checkedPlatform != null) {
                 for (var platformBlock : checkedPlatform.getPlatformBlocks()) {
                     if (platformBlock.equals(block) && !checkedPlatform.isBreakable()) {
-                        event.setCancelled(true);
+                        event.cancelled(true);
                     }
                 }
             }
