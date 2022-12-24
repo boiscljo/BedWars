@@ -1798,6 +1798,7 @@ public class Game implements org.screamingsandals.bedwars.api.game.Game {
                         }
                     }
                     teamSelectorInventory.forEach(gui->gui.destroy());
+                    teamSelectorInventory.clear();
                     if (gameScoreboard.getObjective("lobby") != null) {
                         gameScoreboard.getObjective("lobby").unregister();
                     }
