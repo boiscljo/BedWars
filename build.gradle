@@ -1,12 +1,12 @@
 plugins {
     id 'org.screamingsandals.plugin-builder' version '1.0.78' apply false
-    id 'org.screamingsandals.nms-mapper' version '1.2.3' apply false
+    id 'org.screamingsandals.nms-mapper' version '1.4.2' apply false
     id 'com.github.gmazzo.buildconfig' version '3.0.0' apply false
 }
 
 allprojects {
     group = 'org.screamingsandals.bedwars'
-    version = '0.2.26-SNAPSHOT'
+    version = '0.2.28-SNAPSHOT'
 }
 
 if (version.toString().endsWith('-SNAPSHOT')) {
@@ -23,11 +23,11 @@ subprojects {
     repositories {
         maven { url 'https://repo.extendedclip.com/content/repositories/placeholderapi/'  }
         maven { url 'https://repo.onarandombox.com/content/groups/public'  }
-        maven { url 'https://ci.frostcast.net/plugin/repository/everything'  }
         maven { url 'https://repo.citizensnpcs.co'  }
         maven { url 'https://repo.codemc.org/repository/maven-public/'  }
-        maven { url 'https://jitpack.io'  }
         maven { url 'https://repo.alessiodp.com/releases/'  }
+        maven { url 'https://repo.viaversion.com' }
+        maven { url 'https://jitpack.io'  }
     }
 
     dependencies {

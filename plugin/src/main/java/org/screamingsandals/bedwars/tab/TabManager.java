@@ -21,6 +21,7 @@ package org.screamingsandals.bedwars.tab;
 
 import org.bukkit.ChatColor;
 import org.screamingsandals.bedwars.Main;
+import org.screamingsandals.bedwars.api.game.GameStatus;
 import org.screamingsandals.bedwars.game.GamePlayer;
 import org.screamingsandals.bedwars.lib.nms.accessors.IChatBaseComponent_i_ChatSerializerAccessor;
 import org.screamingsandals.bedwars.lib.nms.accessors.PacketPlayOutPlayerListHeaderFooterAccessor;
@@ -87,8 +88,14 @@ public class TabManager {
     public void clear(GamePlayer player) {
         if (player.player.isOnline() && (header != null || footer != null)) {
             try {
+                String clearString;
+                if (Main.getVersionNumber() >= 115) {
+                    clearString = "{\"text\": \"\"}";
+                } else {
+                    clearString = "{\"translate\": \"\"}";
+                }
                 Object blankComponent = getMethod(getCorrectSerializingMethod())
-                        .invokeStatic("{\"text\": \"\"}");
+                        .invokeStatic(clearString);
                 Object packet;
                 if (PacketPlayOutPlayerListHeaderFooterAccessor.getConstructor1() != null) {
                     packet = PacketPlayOutPlayerListHeaderFooterAccessor.getConstructor1().newInstance(blankComponent, blankComponent);
@@ -107,8 +114,8 @@ public class TabManager {
         List<String> list = new ArrayList<>();
         origin.forEach(a -> list.add(a.replace("%players%", String.valueOf(gamePlayer.getGame().countPlayers()))
                 .replace("%alive%", String.valueOf(gamePlayer.getGame().countAlive()))
-                .replace("%spectating%", String.valueOf(gamePlayer.getGame().countSpectating()))
-                .replace("%spectators%", String.valueOf(gamePlayer.getGame().countSpectators()))
+                .replace("%spectating%", String.valueOf(gamePlayer.getGame().getStatus() != GameStatus.WAITING ? gamePlayer.getGame().countSpectating() : (gamePlayer.getGame().countPlayers() - gamePlayer.getGame().countRespawnable())))
+                .replace("%spectators%", String.valueOf(gamePlayer.getGame().getStatus() != GameStatus.WAITING ? gamePlayer.getGame().countSpectators() : (gamePlayer.getGame().countPlayers() - gamePlayer.getGame().countRespawnable())))
                 .replace("%respawnable%", String.valueOf(gamePlayer.getGame().countRespawnable()))
                 .replace("%max%", String.valueOf(gamePlayer.getGame().getMaxPlayers()))
                 .replace("%map%", gamePlayer.getGame().getName())));

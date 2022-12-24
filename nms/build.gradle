@@ -26,6 +26,9 @@ nmsGen {
         .reqMethod('searge:func_240643_a_', String) // 1.16+
     var DataWatcher = reqClass('spigot:DataWatcher')
         .reqMethod("spigot:watch", int.class, Object.class)
+        .reqMethod('packDirty')
+        .reqMethod('clearDirty')
+        .reqMethod('getAll')
     var World = reqClass('spigot:World')
             .reqMethod('spigot:getMethodProfilerSupplier') // 1.17 and newer
             .reqMethod('spigot:getMethodProfiler') // for something between new and old versions
@@ -113,13 +116,15 @@ nmsGen {
         .reqConstructor(int) // 1.17 retardation
         .reqConstructor(int[])
     reqClass('spigot:PacketPlayOutEntityMetadata')
-        .reqConstructor(int, DataWatcher, boolean)
+        .reqConstructor(int, DataWatcher, boolean) // <= 1.19.2
+        .reqConstructor(int, List) // 1.19.3
     reqClass('spigot:PacketPlayOutEntityTeleport')
         .reqConstructor(Entity)
     reqClass('spigot:PacketPlayOutExperience')
         .reqConstructor(float, int, int)
     reqClass('spigot:PacketPlayOutSpawnEntity')
-        .reqConstructor(EntityLiving)
+        .reqConstructor(EntityLiving) // 1.19-1.19.2
+        .reqConstructor(Entity) // 1.19.3
     reqClass('spigot:PacketPlayOutSpawnEntityLiving')
         .reqConstructor(EntityLiving)
     reqClass('spigot:PacketPlayOutTitle') // does not exist in 1.17
@@ -133,7 +138,8 @@ nmsGen {
     reqClass('spigot:PathfinderGoalMeleeAttack')
         .reqConstructor(EntityCreature, double, boolean)
     reqClass('spigot:PathfinderGoalNearestAttackableTarget')
-        .reqConstructor(EntityInsentient, Class, boolean)
+        .reqConstructor(EntityInsentient, Class, boolean) // 1.14+
+        .reqConstructor(EntityCreature, Class, boolean) // <= 1.13.2
     reqClass('spigot:PlayerConnection')
         .reqField('spigot:networkManager')
         .reqMethod('spigot:sendPacket', Packet)
@@ -154,6 +160,21 @@ nmsGen {
         .reqMethod('recheckStatus')
     reqClass('spigot:EntityHuman')
         .reqMethod('spigot:releaseShoulderEntities')
+    reqClass('spigot:EntityWither')
+        .reqConstructor(World)
+    reqClass('spigot:EntityEnderDragon')
+        .reqConstructor(World)
+        .reqField('spigot:children')
+    reqClass('spigot:PathfinderGoalFloat')
+        .reqConstructor(EntityInsentient)
+    reqClass('spigot:PathfinderGoalRandomStroll')
+        .reqConstructor(EntityCreature, double)
+    reqClass('spigot:PathfinderGoalRandomLookaround')
+        .reqConstructor(EntityInsentient)
+    reqClass('spigot:PathfinderGoalHurtByTarget')
+        .reqConstructor(EntityCreature, boolean, Class[]) // old
+        .reqConstructor(EntityCreature, Class[]) // new
+    reqClass('spigot:EntityIronGolem')
 }
 
 tasks.getByName('compileJava').dependsOn('generateNmsComponents')

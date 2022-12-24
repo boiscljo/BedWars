@@ -194,7 +194,8 @@ public class ShopInventory implements Listener {
             } else {
                 shopMap.get("default").openForPlayer(player);
             }
-        } catch (Throwable ignored) {
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
             player.sendMessage(i18nonly("prefix") + " Your shop.yml/shop.groovy is invalid! Check it out or contact us on Discord.");
         }
     }
@@ -350,6 +351,7 @@ public class ShopInventory implements Listener {
         try {
             format.generateData();
         } catch (Throwable t) {
+            t.printStackTrace();
             Debug.warn("Your shop.yml/shop.groovy is wrong! Loading default one instead", true);
             loadDefault(format);
             format.generateData();
@@ -431,9 +433,18 @@ public class ShopInventory implements Listener {
             double maxStackSize;
             int finalStackSize;
 
-            for (ItemStack itemStack : event.getPlayer().getInventory().getStorageContents()) {
-                if (itemStack != null && itemStack.isSimilar(type.getStack())) {
-                    inInventory = inInventory + itemStack.getAmount();
+            try {
+                for (ItemStack itemStack : event.getPlayer().getInventory().getStorageContents()) {
+                    if (itemStack != null && itemStack.isSimilar(type.getStack())) {
+                        inInventory = inInventory + itemStack.getAmount();
+                    }
+                }
+            } catch (Throwable ignored) {
+                // 1.8.8: let's just hope no one will make chestplate as a currency :skull:
+                for (ItemStack itemStack : event.getPlayer().getInventory().getContents()) {
+                    if (itemStack != null && itemStack.isSimilar(type.getStack())) {
+                        inInventory = inInventory + itemStack.getAmount();
+                    }
                 }
             }
             if (Main.getConfigurator().config.getBoolean("sell-max-64-per-click-in-shop")) {

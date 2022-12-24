@@ -31,12 +31,12 @@ softdepend:
   - MultiWorld
   - UltimateCore
   - PlaceholderAPI
-  - BarAPI
   - PerWorldInventory
   - SlimeWorldManager
   - My_Worlds
   - Citizens
   - Parties
+  - ViaVersion
 commands:
   bw:
     description: Command of BW plugin
