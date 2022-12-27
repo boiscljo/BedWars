@@ -44,14 +44,18 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.MetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.screamingsandals.bedwars.Main;
+import org.screamingsandals.bedwars.api.APIUtils;
 import org.screamingsandals.bedwars.api.RunningTeam;
+import org.screamingsandals.bedwars.api.boss.StatusBar;
 import org.screamingsandals.bedwars.api.events.BedwarsPlayerDeathMessageSendEvent;
 import org.screamingsandals.bedwars.api.events.BedwarsPlayerKilledEvent;
 import org.screamingsandals.bedwars.api.events.BedwarsTeamChestOpenEvent;
 import org.screamingsandals.bedwars.api.game.GameStatus;
+import org.screamingsandals.bedwars.boss.BossBar18;
 import org.screamingsandals.bedwars.commands.BaseCommand;
 import org.screamingsandals.bedwars.game.*;
-import org.screamingsandals.bedwars.inventories.TeamSelectorInventory;
+import org.screamingsandals.bedwars.special.listener.ProtectionWallListener;
+import org.screamingsandals.bedwars.special.listener.RescuePlatformListener;
 import org.screamingsandals.bedwars.statistics.PlayerStatistic;
 import org.screamingsandals.bedwars.utils.*;
 import org.screamingsandals.bedwars.lib.debug.Debug;
@@ -241,8 +245,10 @@ public class PlayerListener implements Listener {
     public void onPlayerQuit(PlayerQuitEvent event) {
         if (Main.isPlayerGameProfileRegistered(event.getPlayer())) {
             GamePlayer gPlayer = Main.getPlayerGameProfile(event.getPlayer());
-            if (gPlayer.isInGame())
+            if (gPlayer.isInGame()) {
+                gPlayer.forceSynchronousTeleportation = true;
                 gPlayer.changeGame(null);
+            }
             Main.unloadPlayerGameProfile(event.getPlayer());
         }
 
@@ -329,6 +335,19 @@ public class PlayerListener implements Listener {
                         MiscUtils.giveItemsToPlayer(givedGameStartItems, gPlayer.player, team.getColor());
                     } else {
                         Debug.warn("You have wrongly configured gived-player-respawn-items!", true);
+                    }
+                }
+            }
+
+            if (Main.getVersionNumber() <= 108 && !Main.getConfigurator().config.getBoolean("allow-fake-death")) {
+                StatusBar boss = game.getStatusBar();
+                if (boss instanceof BossBar18) {
+                    BossBar18 boss18 = (BossBar18) boss;
+                    if (!boss18.isViaPlayer(gPlayer.player)) {
+                        boss18.removePlayer(gPlayer.player);
+                        Bukkit.getScheduler().runTask(Main.getInstance(), () -> {
+                           boss18.addPlayer(gPlayer.player);
+                        });
                     }
                 }
             }
@@ -473,11 +492,7 @@ public class PlayerListener implements Listener {
                             if (item.getType() == Material
                                     .valueOf(Main.getConfigurator().config.getString("items.jointeam", "COMPASS"))) {
                                 if (game.getStatus() == GameStatus.WAITING) {
-                                    TeamSelectorInventory inv = game.getTeamSelectorInventory();
-                                    if (inv == null) {
-                                        return;
-                                    }
-                                    inv.openForPlayer(p);
+                                    game.openTeamSelectorInventory(p);
                                 } else if (gPlayer.isSpectator) {
                                     // TODO
                                 }
@@ -709,11 +724,7 @@ public class PlayerListener implements Listener {
                 if (event.getMaterial() == Material
                         .valueOf(Main.getConfigurator().config.getString("items.jointeam", "COMPASS"))) {
                     if (game.getStatus() == GameStatus.WAITING) {
-                        TeamSelectorInventory inv = game.getTeamSelectorInventory();
-                        if (inv == null) {
-                            return;
-                        }
-                        inv.openForPlayer(player);
+                        game.openTeamSelectorInventory(player);
                     } else if (gPlayer.isSpectator) {
                         // TODO
                     }
@@ -797,6 +808,8 @@ public class PlayerListener implements Listener {
                         } else if (Main.getConfigurator().config.getBoolean("disableCakeEating", true)) {
                             event.setCancelled(true);
                         }
+                    } else if (event.getClickedBlock().getType() == Material.DRAGON_EGG && Main.getConfigurator().config.getBoolean("disableDragonEggTeleport", true)) {
+                        event.setCancelled(true); // Fix - #432
                     }
                 }
             }
@@ -818,34 +831,40 @@ public class PlayerListener implements Listener {
                             }
 
                             if (!anchorFilled && stack.getType().isBlock()) {
-                                BlockFace face = event.getBlockFace();
-                                Block block = event.getClickedBlock().getLocation().clone().add(MiscUtils.getDirection(face))
-                                        .getBlock();
-                                if (block.getType() == Material.AIR) {
-                                    BlockState originalState = block.getState();
-                                    block.setType(stack.getType());
-                                    try {
-                                        // The method is no longer in API, but in legacy versions exists
-                                        Block.class.getMethod("setData", byte.class).invoke(block,
-                                                (byte) stack.getDurability());
-                                    } catch (Exception e) {
-                                    }
-                                    BlockPlaceEvent bevent = new BlockPlaceEvent(block, originalState,
-                                            event.getClickedBlock(), stack, player, true);
-                                    Bukkit.getPluginManager().callEvent(bevent);
+                                if (
+                                        /* These special items don't work with the feature below */
+                                        APIUtils.unhashFromInvisibleStringStartsWith(stack, ProtectionWallListener.PROTECTION_WALL_PREFIX) == null
+                                        && APIUtils.unhashFromInvisibleStringStartsWith(stack, RescuePlatformListener.RESCUE_PLATFORM_PREFIX) == null
+                                ) {
+                                        BlockFace face = event.getBlockFace();
+                                        Block block = event.getClickedBlock().getLocation().clone().add(MiscUtils.getDirection(face))
+                                                .getBlock();
+                                        if (block.getType() == Material.AIR) {
+                                            BlockState originalState = block.getState();
+                                            block.setType(stack.getType());
+                                            try {
+                                                // The method is no longer in API, but in legacy versions exists
+                                                Block.class.getMethod("setData", byte.class).invoke(block,
+                                                        (byte) stack.getDurability());
+                                            } catch (Exception e) {
+                                            }
+                                            BlockPlaceEvent bevent = new BlockPlaceEvent(block, originalState,
+                                                    event.getClickedBlock(), stack, player, true);
+                                            Bukkit.getPluginManager().callEvent(bevent);
 
-                                    if (bevent.isCancelled()) {
-                                        originalState.update(true, false);
-                                    } else {
-                                        if (player.getGameMode() != GameMode.CREATIVE) {
-                                            stack.setAmount(stack.getAmount() - 1);
+                                            if (bevent.isCancelled()) {
+                                                originalState.update(true, false);
+                                            } else {
+                                                if (player.getGameMode() != GameMode.CREATIVE) {
+                                                    stack.setAmount(stack.getAmount() - 1);
+                                                }
+                                                if (!player.isSneaking()) {
+                                                    // TODO get right block place sound
+                                                    Sounds.BLOCK_STONE_PLACE.playSound(player, block.getLocation(), 1, 1);
+                                                }
+                                            }
                                         }
-                                        if (!player.isSneaking()) {
-                                            // TODO get right block place sound
-                                            Sounds.BLOCK_STONE_PLACE.playSound(player, block.getLocation(), 1, 1);
                                         }
-                                    }
-                                }
                             }
                         }
                     }
@@ -861,9 +880,14 @@ public class PlayerListener implements Listener {
             if (blockBreakEvent.isCancelled()) {
                 return;
             }
-            if (blockBreakEvent.isDropItems()) {
-                event.getClickedBlock().breakNaturally();
-            } else {
+            try {
+                if (blockBreakEvent.isDropItems()) {
+                    event.getClickedBlock().breakNaturally();
+                } else {
+                    event.getClickedBlock().setType(Material.AIR);
+                }
+            } catch (Throwable ignored) {
+                // 1.8.8 :(
                 event.getClickedBlock().setType(Material.AIR);
             }
         }

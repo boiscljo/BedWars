@@ -1,0 +1,31 @@
+{
+    "python.autoComplete.extraPaths": [
+        "/home/boiscljo/ros2/install/zed_interfaces/lib/python3.8/site-packages",
+        "/home/boiscljo/ros2/install/septentrio_gnss_driver/lib/python3.8/site-packages",
+        "/home/boiscljo/ros2/install/sensor_visualizer/lib/python3.8/site-packages",
+        "/home/boiscljo/ros2/install/rslidar_msg/lib/python3.8/site-packages",
+        "/home/boiscljo/ros2/install/rqt_carla_control/lib/python3.8/site-packages",
+        "/home/boiscljo/ros2/install/carla_waypoint_publisher/lib/python3.8/site-packages",
+        "/home/boiscljo/ros2/install/carla_ackermann_control/lib/python3.8/site-packages",
+        "/home/boiscljo/ros2/install/carla_ros_bridge/lib/python3.8/site-packages",
+        "/home/boiscljo/ros2/install/carla_spawn_objects/lib/python3.8/site-packages",
+        "/home/boiscljo/ros2/install/carla_manual_control/lib/python3.8/site-packages",
+        "/home/boiscljo/ros2/install/carla_ad_agent/lib/python3.8/site-packages",
+        "/home/boiscljo/ros2/install/ros_compatibility/lib/python3.8/site-packages",
+        "/home/boiscljo/ros2/install/radar_conti_ars408_msgs/lib/python3.8/site-packages",
+        "/home/boiscljo/ros2/install/kia_soul/lib/python3.8/site-packages",
+        "/home/boiscljo/ros2/install/carla_waypoint_types/lib/python3.8/site-packages",
+        "/home/boiscljo/ros2/install/carla_walker_agent/lib/python3.8/site-packages",
+        "/home/boiscljo/ros2/install/carla_twist_to_control/lib/python3.8/site-packages",
+        "/home/boiscljo/ros2/install/carla_ros_scenario_runner/lib/python3.8/site-packages",
+        "/home/boiscljo/ros2/install/carla_ros_scenario_runner_types/lib/python3.8/site-packages",
+        "/home/boiscljo/ros2/install/carla_ackermann_msgs/lib/python3.8/site-packages",
+        "/home/boiscljo/ros2/install/apollo_sensor_bridge/lib/python3.8/site-packages",
+        "/home/boiscljo/ros2/install/apollo_carla_bridge/lib/python3.8/site-packages",
+        "/home/boiscljo/ros2/install/carla_msgs/lib/python3.8/site-packages",
+        "/home/boiscljo/ros2/install/carla_common/lib/python3.8/site-packages",
+        "/home/boiscljo/ros2/install/campus_dae/lib/python3.8/site-packages",
+        "/home/boiscljo/ros2uqtr/install/apollo_msgs/lib/python3.8/site-packages",
+        "/opt/ros/foxy/lib/python3.8/site-packages"
+    ]
+}
