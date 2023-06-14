@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 ScreamingSandals
+ * Copyright (C) 2023 ScreamingSandals
  *
  * This file is part of Screaming BedWars.
  *
@@ -203,6 +203,16 @@ public class LegacyRegion implements Region {
     @Override
     public boolean isBedHead(BlockState block) {
         return isBedBlock(block) && ((Bed) block.getData()).isHeadOfBed();
+    }
+
+    @Override
+    public boolean isDoorBlock(BlockState block) {
+        return block.getData() instanceof Door;
+    }
+
+    @Override
+    public boolean isDoorBottomBlock(BlockState block) {
+        return block.getData() instanceof Door && !((Door) block.getData()).isTopHalf();
     }
 
     @Override

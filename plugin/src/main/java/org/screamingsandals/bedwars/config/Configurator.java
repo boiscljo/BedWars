@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 ScreamingSandals
+ * Copyright (C) 2023 ScreamingSandals
  *
  * This file is part of Screaming BedWars.
  *
@@ -163,6 +163,11 @@ public class Configurator {
         checkOrSetConfig(modify, "respawn-cooldown.time", 5);
         checkOrSetConfig(modify, "stop-team-spawners-on-die", false);
         checkOrSetConfig(modify, "allow-fake-death", false);
+        checkOrSetConfig(modify, "prefer-1-19-4-display-entities", true);
+        checkOrSetConfig(modify, "remember-what-scoreboards-players-had-before", false);
+
+        checkOrSetConfig(modify, "kick-players-upon-final-death.enabled", false);
+        checkOrSetConfig(modify, "kick-players-upon-final-death.delay", 5);
 
         checkOrSetConfig(modify, "allowed-commands", new ArrayList<>());
         checkOrSetConfig(modify, "change-allowed-commands-to-blacklist", false);
@@ -485,6 +490,11 @@ public class Configurator {
 
         checkOrSetConfig(modify, "rewards.enabled", false);
         checkOrSetConfig(modify, "rewards.player-win", new ArrayList<String>() {
+            {
+                add("/example {player} 200");
+            }
+        });
+        checkOrSetConfig(modify, "rewards.player-win-run-immediately", new ArrayList<String>() {
             {
                 add("/example {player} 200");
             }

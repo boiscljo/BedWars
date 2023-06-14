@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 ScreamingSandals
+ * Copyright (C) 2023 ScreamingSandals
  *
  * This file is part of Screaming BedWars.
  *
@@ -33,11 +33,11 @@ public class ColorChanger implements org.screamingsandals.bedwars.api.utils.Colo
 
         if (Main.autoColoredMaterials.contains(materialName)) {
             itemStack.setDurability((short) teamColor.woolData);
-        } else if (material.toString().contains("GLASS")) {
-            itemStack.setType(Material.getMaterial("STAINED_GLASS"));
-            itemStack.setDurability((short) teamColor.woolData);
         } else if (material.toString().contains("GLASS_PANE")) {
             itemStack.setType(Material.getMaterial("STAINED_GLASS_PANE"));
+            itemStack.setDurability((short) teamColor.woolData);
+        } else if (material.toString().contains("GLASS")) {
+            itemStack.setType(Material.getMaterial("STAINED_GLASS"));
             itemStack.setDurability((short) teamColor.woolData);
         }
         return itemStack;
@@ -55,10 +55,10 @@ public class ColorChanger implements org.screamingsandals.bedwars.api.utils.Colo
 
         if (Main.autoColoredMaterials.contains(materialName)) {
             return Material.getMaterial(teamMaterialColor + "_" + materialName);
-        } else if (material.toString().contains("GLASS")) {
-            return Material.getMaterial(teamMaterialColor + "_STAINED_GLASS");
         } else if (material.toString().contains("GLASS_PANE")) {
             return Material.getMaterial(teamMaterialColor + "_STAINED_GLASS_PANE");
+        } else if (material.toString().contains("GLASS")) {
+            return Material.getMaterial(teamMaterialColor + "_STAINED_GLASS");
         }
         return material;
 

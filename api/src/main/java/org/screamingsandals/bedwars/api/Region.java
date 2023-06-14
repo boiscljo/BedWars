@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 ScreamingSandals
+ * Copyright (C) 2023 ScreamingSandals
  *
  * This file is part of Screaming BedWars.
  *
@@ -68,6 +68,10 @@ public interface Region {
      * @return
      */
     boolean isBedHead(BlockState block);
+
+    boolean isDoorBlock(BlockState block);
+
+    boolean isDoorBottomBlock(BlockState block);
 
     /**
      * @param head
