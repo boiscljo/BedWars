@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2022 ScreamingSandals
+# Copyright (C) 2023 ScreamingSandals
 #
 # This file is part of Screaming BedWars.
 #
@@ -40,6 +40,7 @@ arena_removed: "&c&lArena removed!"
 arena_added: "&aArena added!"
 arena_switched_to_edit: "&aArena switched to edit mode!"
 bed_is_destroyed: "Bed of %team%&r is destroyed!"
+door_is_destroyed: "Door of %team%&r is destroyed!"
 target_is_destroyed: "Target block of %team%&r is destroyed!"
 anchor_is_destroyed: "Respawn Anchor of %team%&r is destroyed!"
 cake_is_destroyed: "Cake of %team%&r has been eaten!"
@@ -261,14 +262,17 @@ protect_your_bed: "%teamcolor%&lProtect your bed!"
 protect_your_target: "%teamcolor%&lProtect your target block!"
 protect_your_anchor: "%teamcolor%&lProtect your anchor!"
 protect_your_cake: "%teamcolor%&lProtect your cake!"
+protect_your_door: "%teamcolor%&lProtect your door!"
 protect_your_bed_destroyed: "&7&lBed is destroyed."
 protect_your_target_destroyed: "&7&lTarget block is destroyed."
 protect_your_anchor_destroyed: "&7&lAnchor is destroyed."
 protect_your_cake_destroyed: "&7&lCake has been eaten."
+protect_your_door_destroyed: "&7&lDoor is destroyed."
 destroy_this_bed: "%teamcolor%&lDestroy this bed!"
 destroy_this_target: "%teamcolor%&lDestroy this target block!"
 destroy_this_anchor: "%teamcolor%&lDestroy this anchor!"
 destroy_this_cake: "%teamcolor%&lEat this cake!"
+destroy_this_door: "%teamcolor%&lDestroy this door!"
 help_title: "BedWars %version% - Help"
 help_title_console: "BedWars %version% - Help for Console"
 help_bw_join: "/bw join <arena> - &aJoin the game"
@@ -362,3 +366,4 @@ help_bw_cheat_destroybed: "/bw cheat destroybed <team> - &cDestroys bed of the s
 help_bw_cheat_destroyallbeds: "/bw cheat destroyallbeds - &cDestroys all beds in the game"
 help_bw_cheat_jointeam: "/bw cheat jointeam [team] - &cJoins an admin to the specified team or to current team ignoring its size (can also be used while the game is running, however the team must have some players)"
 cheat_received_target_blocks_destroy: "&aBeds of all teams have been destroyed!"
+kicking_in: "&cLeaving the arena in: &7%time%"

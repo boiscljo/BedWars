@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 ScreamingSandals
+ * Copyright (C) 2023 ScreamingSandals
  *
  * This file is part of Screaming BedWars.
  *
@@ -33,7 +33,7 @@ public class Player113ListenerUtils {
             }
             cake.setBites(cake.getBites() + 1);
             if (cake.getBites() >= cake.getMaximumBites()) {
-                game.bedDestroyed(event.getClickedBlock().getLocation(), event.getPlayer(), false, false, true);
+                game.bedDestroyed(event.getClickedBlock().getLocation(), event.getPlayer(), false, false, true, false);
                 event.getClickedBlock().setType(Material.AIR);
             } else {
                 event.getClickedBlock().setBlockData(cake);
