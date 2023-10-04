@@ -223,7 +223,6 @@ public class Game implements org.screamingsandals.bedwars.api.game.Game {
     private BukkitTask task;
     private List<CurrentTeam> teamsInGame = new ArrayList<>();
     private Region region = Main.isLegacy() ? new LegacyRegion() : new FlatteningRegion();
-    private List<TeamSelectorInventory> teamSelectorInventory = new ArrayList<>();
     private Scoreboard gameScoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
     private StatusBar statusbar;
     private Map<Location, ItemStack[]> usedChests = new HashMap<>();
