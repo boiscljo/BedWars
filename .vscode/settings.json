@@ -27,5 +27,6 @@
         "/home/boiscljo/ros2/install/campus_dae/lib/python3.8/site-packages",
         "/home/boiscljo/ros2uqtr/install/apollo_msgs/lib/python3.8/site-packages",
         "/opt/ros/foxy/lib/python3.8/site-packages"
-    ]
+    ],
+    "java.configuration.updateBuildConfiguration": "interactive"
 }
