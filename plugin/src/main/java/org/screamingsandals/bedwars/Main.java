@@ -56,6 +56,7 @@ import org.screamingsandals.bedwars.special.SpecialRegister;
 import org.screamingsandals.bedwars.statistics.PlayerStatisticManager;
 import org.screamingsandals.bedwars.tab.TabManager;
 import org.screamingsandals.bedwars.utils.BedWarsSignOwner;
+import org.screamingsandals.bedwars.utils.MiscUtils;
 import org.screamingsandals.bedwars.utils.UpdateChecker;
 import org.screamingsandals.bedwars.lib.debug.Debug;
 import org.screamingsandals.bedwars.lib.nms.holograms.HologramManager;
@@ -82,7 +83,6 @@ public class Main extends JavaPlugin implements BedwarsAPI {
     private boolean isDisabling = false;
     private boolean isSpigot, isLegacy;
     private boolean isVault;
-    private boolean isNMS;
     private int versionNumber = 0;
     private Economy econ = null;
     private HashMap<String, Game> games = new HashMap<>();
@@ -137,10 +137,6 @@ public class Main extends JavaPlugin implements BedwarsAPI {
 
     public static boolean isLegacy() {
         return instance.isLegacy;
-    }
-
-    public static boolean isNMS() {
-        return instance.isNMS;
     }
 
     public static void depositPlayer(Player player, double coins) {
@@ -359,7 +355,6 @@ public class Main extends JavaPlugin implements BedwarsAPI {
         instance = this;
         version = this.getDescription().getVersion();
         boolean snapshot = version.toLowerCase().contains("pre") || version.toLowerCase().contains("snapshot");
-        isNMS = ClassStorage.NMS_BASED_SERVER;
         isSpigot = ClassStorage.IS_SPIGOT_SERVER;
         colorChanger = new org.screamingsandals.bedwars.utils.ColorChanger();
 
@@ -433,7 +428,8 @@ public class Main extends JavaPlugin implements BedwarsAPI {
         new MainlobbyCommand();
         new LeaderboardCommand();
         new DumpCommand();
-        new CheatCommand();
+        new CheatCommand("cheat", false);
+        new CheatCommand("cheatIn", true);
 
         BwCommandsExecutor cmd = new BwCommandsExecutor();
         getCommand("bw").setExecutor(cmd);
@@ -766,6 +762,25 @@ public class Main extends JavaPlugin implements BedwarsAPI {
         }
 
         return availableGames.lastEntry().getValue();
+    }
+
+    public org.screamingsandals.bedwars.api.game.Game getRandomWaitingGameForBungeeMode() {
+        final TreeMap<Integer, List<Game>> availableGames = new TreeMap<>();
+        games.values().forEach(game -> {
+            if (game.getStatus() != GameStatus.WAITING) {
+                return;
+            }
+
+            availableGames.computeIfAbsent(game.getConnectedPlayers().size(), ArrayList::new).add(game);
+        });
+
+        if (availableGames.isEmpty()) {
+            return null;
+        }
+
+        List<Game> gamesWithMinimumPlayers = availableGames.lastEntry().getValue();
+
+        return gamesWithMinimumPlayers.get(MiscUtils.randInt(0, gamesWithMinimumPlayers.size() - 1));
     }
 
     public org.screamingsandals.bedwars.api.game.Game getFirstRunningGame() {

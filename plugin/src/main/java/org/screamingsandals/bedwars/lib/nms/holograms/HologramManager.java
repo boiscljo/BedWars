@@ -29,11 +29,12 @@ import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.*;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.screamingsandals.bedwars.lib.nms.accessors.PacketPlayInUseEntityAccessor;
+import org.screamingsandals.bedwars.lib.nms.accessors.ServerboundInteractPacketAccessor;
 import org.screamingsandals.bedwars.lib.nms.network.inbound.AutoPacketInboundListener;
 
 public class HologramManager implements Listener {
@@ -50,8 +51,8 @@ public class HologramManager implements Listener {
 			
 			@Override
 			protected Object handle(Player sender, Object packet) throws Throwable {
-				if (PacketPlayInUseEntityAccessor.getType().isInstance(packet)) {
-					int a = (int) getField(packet, PacketPlayInUseEntityAccessor.getFieldField_149567_a());
+				if (ServerboundInteractPacketAccessor.TYPE.get().isInstance(packet)) {
+					int a = (int) getField(packet, ServerboundInteractPacketAccessor.FIELD_ENTITY_ID.get());
 					for (Hologram h : HOLOGRAMS) {
 						if (h.handleTouch(sender, a)) {
 							break;
@@ -155,7 +156,7 @@ public class HologramManager implements Listener {
 		}
 	}
 	
-	@EventHandler
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onPlayerRespawn(PlayerRespawnEvent event) {
 		if (HOLOGRAMS.isEmpty()) {
 			return;
